@@ -1,0 +1,11 @@
+# 依赖与产物（不入库）
+node_modules/
+dist/
+
+# 系统 / 编辑器噪音
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
+.vscode/
+.idea/

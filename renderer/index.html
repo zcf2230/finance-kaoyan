@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>金融考研择校通</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="logo">
+      <div class="logo-icon">金</div>
+      <div><div class="logo-title">金融考研择校通</div><div class="logo-sub">学硕 · 专硕 · 择校参考</div></div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-view="query">🔍 院校查询</button>
+      <button class="nav-btn" data-view="national">📈 国家线参考</button>
+      <button class="nav-btn" data-view="manage">🗂️ 数据管理</button>
+      <button class="nav-btn" data-view="about">ℹ️ 使用说明</button>
+    </nav>
+    <div class="sidebar-foot" id="statLine"></div>
+  </aside>
+
+  <main id="main">
+    <!-- ========== 院校查询 ========== -->
+    <section id="view-query" class="view">
+      <div class="filters">
+        <input id="fSearch" type="search" placeholder="搜索院校名称 / 城市…">
+        <select id="fProv"><option value="">全部省份</option></select>
+        <select id="fTag">
+          <option value="">全部层次</option>
+          <option value="985">985</option>
+          <option value="211">211</option>
+          <option value="双一流">双一流</option>
+          <option value="财经类">财经类院校</option>
+          <option value="自划线">34所自划线</option>
+        </select>
+        <select id="fProgram">
+          <option value="z">金融专硕（0251）</option>
+          <option value="x">金融学硕（0202）</option>
+          <option value="">两者都看</option>
+        </select>
+        <select id="fMath">
+          <option value="">数学不限</option>
+          <option value="数三">考数学三</option>
+          <option value="396">考396经综</option>
+        </select>
+        <select id="fSort">
+          <option value="default">默认排序</option>
+          <option value="line">复试线 高→低</option>
+          <option value="fee">学费 低→高</option>
+          <option value="fav">收藏优先</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="fFav"> 只看收藏</label>
+      </div>
+      <div id="results"></div>
+    </section>
+
+    <!-- ========== 国家线 ========== -->
+    <section id="view-national" class="view" style="display:none">
+      <h2>历年考研国家线 · 经济学门类</h2>
+      <p class="muted" style="margin-bottom:14px">金融学硕（应用经济学 0202）与金融专硕（0251）均执行经济学门类国家线。国家线是进入复试的最低门槛，名校复试线通常高出国家线 40~80 分。</p>
+      <div id="nationalTable"></div>
+      <div class="card" style="margin-top:16px">
+        <b>A 区 / B 区说明</b>
+        <p class="muted">A 区：北京、天津、河北、山西、辽宁、吉林、黑龙江、上海、江苏、浙江、安徽、福建、江西、山东、河南、湖北、湖南、广东、重庆、四川、陕西 21 个省市；B 区：内蒙古、广西、海南、贵州、云南、西藏、甘肃、青海、宁夏、新疆 10 个省区，B 区总分线一般比 A 区低 10 分左右，单科低 3~5 分。</p>
+      </div>
+    </section>
+
+    <!-- ========== 数据管理 ========== -->
+    <section id="view-manage" class="view" style="display:none">
+      <h2>数据管理</h2>
+      <div class="toolbar">
+        <button id="btnAdd" class="primary">＋ 添加院校</button>
+        <button id="btnExport">导出备份</button>
+        <button id="btnImport">导入备份</button>
+        <button id="btnOpenDir">打开数据文件夹</button>
+        <button id="btnReset" class="danger">恢复内置数据</button>
+      </div>
+      <p class="muted" style="margin:10px 0">数据保存在本机（应用内编辑自动保存）。每年招生简章公布后（约 9-10 月），建议核对各校最新数据并在此更新。点击院校行右侧「编辑」修改数据。</p>
+      <div id="manageTable"></div>
+    </section>
+
+    <!-- ========== 说明 ========== -->
+    <section id="view-about" class="view" style="display:none">
+      <h2>使用说明与数据声明</h2>
+      <div class="card">
+        <b>1. 数据来源与准确性</b>
+        <p class="muted">本软件数据由公开资料（研招网、各校研究生院官网、公开报道）整理而成，<b>仅供参考，不构成任何择校承诺</b>。报录比、复试线、学费每年都会变化，部分院校不同学院（如人大财金学院与苏州学院、厦大经济学院与王亚南研究院）数据差异很大。报考前务必以<b>研招网（yz.chsi.com.cn）和目标院校研究生院官网当年招生简章</b>为准。每条数据都标有参考年份，点击院校可跳转官方渠道核实。</p>
+      </div>
+      <div class="card">
+        <b>2. 怎么查「报名人数 / 报录比」</b>
+        <p class="muted">多数院校不官方公布报名人数。常用渠道：① 研招网「硕士专业目录」看拟招人数；② 目标院校研究生院官网搜「报录比」或「报考录取情况统计」（如对外经贸、南开、东南大学等每年公示）；③ 打电话给学院研招办。本软件里空缺的字段表示公开渠道没有可靠数据，欢迎你在「数据管理」中自行补充。</p>
+      </div>
+      <div class="card">
+        <b>3. 学硕 vs 专硕怎么选</b>
+        <p class="muted">学硕（0202）：多数考数学三＋经济学综合，学费约 8000 元/年，学制 3 年（部分 2 年），偏学术、便于读博；统考名额普遍少于专硕且推免占比高。专硕（0251）：考 431 金融学综合，数学三或 396 经综（396 难度低但需逻辑写作，改造调剂面窄），学制 2 年为主，学费高（名校金专全程可达 10 万以上），偏就业。顶尖院校金专推免比例常超 50%，统考竞争激烈。</p>
+      </div>
+      <div class="card">
+        <b>4. 数据每年怎么更新</b>
+        <p class="muted">在「数据管理」页点击「添加院校 / 编辑」直接改；「导出备份」生成 JSON 文件保存到任意位置，「导入备份」可恢复或迁移到别的电脑（安装版数据存于 C:\Users\你\AppData\Roaming\finance-kaoyan-app）。</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-mask" id="detailMask" style="display:none">
+  <div class="modal" id="detailModal"></div>
+</div>
+
+<!-- 编辑弹窗 -->
+<div class="modal-mask" id="editMask" style="display:none">
+  <div class="modal wide" id="editModal"></div>
+</div>
+
+<!-- 对比浮条 -->
+<div id="compareBar" style="display:none">
+  <span id="compareList"></span>
+  <button id="btnCompare" class="primary">开始对比</button>
+  <button id="btnClearCompare">清空</button>
+</div>
+
+<!-- 对比弹窗 -->
+<div class="modal-mask" id="compareMask" style="display:none">
+  <div class="modal wide" id="compareModal"></div>
+</div>
+
+<div id="toast" style="display:none"></div>
+<script src="app.js"></script>
+</body>
+</html>
