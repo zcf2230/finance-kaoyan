@@ -2,7 +2,8 @@
 'use strict';
 
 const PROVS = ["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","西藏","陕西","甘肃","青海","宁夏","新疆"];
-const YEARS = [2026, 2025, 2024, 2023];
+// 年份降序：第一项是"当前招生年度"。每年 9-10 月新简章发布后，在这里加一个新年份、删掉最老的即可。
+const YEARS = [2027, 2026, 2025, 2024];
 const ALL_TAGS = ["985", "211", "双一流", "财经类", "自划线"];
 
 let DATA = null;               // {national, schools}
@@ -194,6 +195,8 @@ function detailSec(sch, key) {
       <span class="k">学制</span><span>${p.d ? esc(p.d) : '—'}</span>
       <span class="k">初试数学</span><span>${p.m ? esc(p.m) : '<span class="muted">待核实</span>'}</span>
       <span class="k">专业课</span><span>${p.j ? esc(p.j) : '—'}</span>
+      ${p.bk ? `<span class="k">参考书目</span><span>${esc(p.bk)}</span>` : ''}
+      ${p.emp ? `<span class="k">就业 / 口碑</span><span>${esc(p.emp)}</span>` : ''}
       ${p.nt ? `<span class="k">备注</span><span>${esc(p.nt)}</span>` : ''}
     </div></div>`;
 }
@@ -207,6 +210,9 @@ function openDetail(id) {
     ${s.z ? detailSec(s, 'z') : ''}
     ${s.x ? detailSec(s, 'x') : ''}
     ${s.note ? `<div class="detail-sec"><h4>综合备注</h4><p class="muted">${esc(s.note)}</p></div>` : ''}
+    ${(s.sources && s.sources.length) ? `<div class="detail-sec"><h4>数据核实来源</h4>
+      <div class="linkrow">${s.sources.map((u, i) => `<a href="${esc(u)}" target="_blank">→ 来源 ${i + 1}</a>`).join('')}</div>
+    </div>` : ''}
     <div class="linkrow">
       <a href="https://yz.chsi.com.cn/zsml/" target="_blank">→ 研招网硕士专业目录（查拟招人数）</a>
       <a href="https://www.bing.com/search?q=${q}" target="_blank">→ 搜索 ${esc(s.name)} 官方复试线/简章</a>
@@ -263,8 +269,8 @@ function progForm(key, p) {
   const opt = (val, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${val}</option>`;
   const mathOptions = ['303数学三', '396经济类综合', '数三或396（分学院）', '不考数学', '待核实']
     .map(o => opt(o, mathSel)).join('');
-  const lineInputs = YEARS.slice().reverse().map(y =>
-    field(`${y} 年复试线`, `<input type="number" data-p="${key}" data-k="l_${y}" value="${p && p.l && p.l[y] ? p.l[y] : ''}" placeholder="空=未收录">`)
+  const lineInputs = YEARS.map(y =>
+    field(`${y} 年复试线`, `<input type="number" data-p="${key}" data-k="l_${y}" value="${p && p.l && p.l[y] ? p.l[y] : ''}" placeholder="${y > new Date().getFullYear() ? '尚未公布' : '空=未收录'}">`)
   ).join('');
   return `<fieldset><legend>${nm}</legend>
     <div class="form-grid">
@@ -274,8 +280,10 @@ function progForm(key, p) {
       ${field('学制', `<input data-p="${key}" data-k="d" value="${v('d')}" placeholder="如：2年">`)}
       ${lineInputs}
       ${field('复试线（约数，无确切值时填）', `<input data-p="${key}" data-k="la" value="${v('la')}" placeholder="如：360-380">`)}
-      ${field('录取人数', `<input data-p="${key}" data-k="e" value="${v('e')}" placeholder="如：2024年录取约90人（含调剂）">`)}
-      ${field('报名人数', `<input data-p="${key}" data-k="a" value="${v('a')}" placeholder="如：2024年报名约560人">`)}
+      ${field('录取人数', `<input data-p="${key}" data-k="e" value="${v('e')}" placeholder="如：2026年录取约90人（含调剂）">`)}
+      ${field('报名人数', `<input data-p="${key}" data-k="a" value="${v('a')}" placeholder="如：2026年报名约560人">`)}
+      ${field('专业课参考书目', `<input data-p="${key}" data-k="bk" value="${v('bk')}" placeholder="如：《公司理财》罗斯、《金融学》黄达">`, true)}
+      ${field('就业方向 / 口碑', `<input data-p="${key}" data-k="emp" value="${v('emp')}" placeholder="如：券商投行、银行总行，华东地区认可度高">`, true)}
       ${field('备注', `<textarea data-p="${key}" data-k="nt" rows="2" placeholder="如：推免比例高、分学院招生等">${v('nt')}</textarea>`, true)}
     </div></fieldset>`;
 }
@@ -366,6 +374,8 @@ function openCompare() {
       ${row('学制', s => (s[progKey] || {}).d)}
       ${row('初试数学', s => (s[progKey] || {}).m)}
       ${row('专业课', s => (s[progKey] || {}).j)}
+      ${row('参考书目', s => (s[progKey] || {}).bk)}
+      ${row('就业 / 口碑', s => (s[progKey] || {}).emp)}
       ${row('备注', s => (s[progKey] || {}).nt)}
       ${row('数据年份', s => s.y)}
     </tbody></table>`;
@@ -380,6 +390,15 @@ function updateStat() {
 
 async function init() {
   DATA = await getApi().loadData();
+  if (DATA._migration) {
+    const m = DATA._migration;
+    delete DATA._migration;
+    setTimeout(() => toast(
+      m.mode === 'replace'
+        ? `数据已更新至 v${m.to}：共收录 ${m.total} 所院校`
+        : `数据已更新至 v${m.to}：新增院校已并入，你的 ${m.kept} 所自定义数据已保留`
+    ), 800);
+  }
   $('#fProv').innerHTML = '<option value="">全部省份</option>' + PROVS.map(p => `<option>${p}</option>`).join('');
 
   document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => {

@@ -9,3 +9,6 @@ desktop.ini
 *.log
 .vscode/
 .idea/
+
+# 临时研究产物（合并后删除）
+.research/
