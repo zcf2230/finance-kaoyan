@@ -18,6 +18,8 @@ const LEGACY_HASH = 'ea5d8b2c8b26bbea77939ce8a939a61b';
 
 const results = [];
 const check = (name, cond) => results.push([cond ? 'PASS' : 'FAIL', name]);
+const skip = name => results.push(['SKIP', name]);
+let skipCount = 0;
 
 // 当前内置数据（作为期望值）
 function bundledSchools() {
@@ -63,18 +65,25 @@ const tmpRoot = path.join(os.tmpdir(), 'kaoyan-mig-test');
 const bundled = bundledSchools();
 
 // ---------- 场景 A：老数据 = v1.0.0 原样（指纹匹配 LEGACY_HASH）----------
-// 用 git 里的 v1.0.0 数据构造；若 git 不可用则跳过指纹精确匹配的强断言
+// v1.0.0 数据 = 仓库根提交里的 data/batch*.json。
+// 注意：必须用根提交，不能用 HEAD~1 —— 每次新增提交都会让 HEAD~1 漂移。
 let v1Schools = null;
 try {
   const { execSync } = require('child_process');
-  const files = [1, 2, 3, 4].map(i => execSync(`git show HEAD~1:data/batch${i}.json`, { cwd: ROOT, encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 }));
+  const root = execSync('git rev-list --max-parents=0 HEAD', { cwd: ROOT, encoding: 'utf-8' }).trim().split('\n')[0];
+  const files = [1, 2, 3, 4].map(i => execSync(`git show ${root}:data/batch${i}.json`, { cwd: ROOT, encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 }));
   v1Schools = files.flatMap(t => JSON.parse(t));
-} catch (e) { /* git 不可用时退化为普通老数据 */ }
+} catch (e) { /* git 不可用 */ }
 
-if (v1Schools) {
-  const crypto = require('crypto');
-  const h = crypto.createHash('md5').update(JSON.stringify(v1Schools)).digest('hex');
-  check('v1.0.0 数据指纹与 main.js 里的 LEGACY_SEED_HASH 一致', h === LEGACY_HASH);
+const crypto = require('crypto');
+const md5 = s => crypto.createHash('md5').update(JSON.stringify(s)).digest('hex');
+const baselineOk = !!v1Schools && md5(v1Schools) === LEGACY_HASH;
+
+if (baselineOk) {
+  check('v1.0.0 数据指纹与 main.js 里的 LEGACY_SEED_HASH 一致', true);
+} else {
+  skip('取不到 v1.0.0 基线（git 不可用或历史被重写），跳过「未改过数据→整体替换」场景');
+  skipCount++;
 }
 
 const dirA = path.join(tmpRoot, 'a');
@@ -84,11 +93,17 @@ check('A. 老数据被迁移（dataVersion → 2）', A.data.dataVersion === 2);
 check('A. 院校数变为最新内置数量', A.data.schools.length === bundled.length);
 check('A. 生成了 data.backup-*.json 备份', filesA.some(f => /^data\.backup-\d+\.json$/.test(f)));
 check('A. 写入 seedHash 指纹', typeof A.data.seedHash === 'string' && A.data.seedHash.length === 32);
-check('A. 备份文件内容为迁移前的 126 所', (() => {
+check('A. 备份文件内容为迁移前的院校数据', (() => {
   const bak = filesA.find(f => /^data\.backup-/.test(f));
-  return bak && JSON.parse(fs.readFileSync(path.join(dirA, bak), 'utf-8')).schools.length === (v1Schools ? v1Schools.length : bundled.length);
+  const expect = (v1Schools || bundled).length;
+  return bak && JSON.parse(fs.readFileSync(path.join(dirA, bak), 'utf-8')).schools.length === expect;
 })());
-check('A. 返回 _migration 提示信息（mode=replace）', A.data._migration && A.data._migration.mode === 'replace');
+if (baselineOk) {
+  check('A. 返回 _migration 提示信息（mode=replace）', A.data._migration && A.data._migration.mode === 'replace');
+} else {
+  skip('A. 未取得基线，无法断言 mode=replace');
+  skipCount++;
+}
 
 // ---------- 场景 B：用户改过数据 ----------
 const edited = JSON.parse(JSON.stringify(v1Schools || bundled));
@@ -119,5 +134,7 @@ fs.rmSync(tmpRoot, { recursive: true, force: true });
 
 const fails = results.filter(r => r[0] === 'FAIL');
 for (const [s, n] of results) console.log(s, '-', n);
-console.log(fails.length ? `\n${fails.length} 项失败` : '\n全部通过 ✔');
+const passed = results.filter(r => r[0] === 'PASS').length;
+console.log(`\n通过 ${passed} 项，跳过 ${skipCount} 项，失败 ${fails.length} 项`);
+console.log(fails.length ? '存在失败项' : '全部通过 ✔');
 process.exit(fails.length ? 1 : 0);

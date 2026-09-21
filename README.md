@@ -9,7 +9,7 @@
 ```bash
 npm install        # 安装依赖
 npm start          # 启动应用（开发模式）
-node test-renderer.js   # 运行功能测试（24 项）
+npm test           # 运行全部测试（渲染逻辑 24 项 + 数据迁移 15 项）
 npm run dist       # 打包 Windows 安装包（输出到 dist/）
 ```
 

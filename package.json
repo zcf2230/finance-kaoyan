@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "test": "node test-renderer.js && node tools/test-migration.js",
     "dist": "electron-builder --win nsis"
   },
   "build": {
