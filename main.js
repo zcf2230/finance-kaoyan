@@ -46,7 +46,7 @@ function readBundledData() {
 
 // 迁移前先备份用户数据，绝不静默丢数据
 function backupUserData() {
-  const stamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 15);
+  const stamp = new Date().toISOString().replace(/\.\d+Z$/, '').replace(/[-:T]/g, '');
   const bak = path.join(dataDir(), `data.backup-${stamp}.json`);
   try { fs.copyFileSync(dataFile(), bak); } catch (e) { return null; }
   return bak;
