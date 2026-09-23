@@ -112,3 +112,14 @@ legend { font-size: 13px; color: var(--brand); font-weight: bold; padding: 0 6px
 
 /* ---------- Toast ---------- */
 #toast { position: fixed; top: 26px; left: 50%; transform: translateX(-50%); background: #16283f; color: #fff; padding: 10px 22px; border-radius: 8px; z-index: 200; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+
+/* ---------- 网页版 / 桌面版差异 ---------- */
+/* 跑在浏览器里时 body 会带 .web-mode：隐藏只在桌面应用里有意义的元素 */
+body.web-mode .web-hide { display: none !important; }
+body:not(.web-mode) .web-only { display: none !important; }
+
+/* ---------- 超宽显示器 ---------- */
+/* 桌面应用窗口是 1440 宽，但浏览器可能铺满 2K/4K 屏，限制内容宽度避免卡片被拉得过长 */
+@media (min-width: 1680px) {
+  #main > .view { max-width: 1360px; margin-left: auto; margin-right: auto; }
+}

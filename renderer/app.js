@@ -5,6 +5,8 @@ const PROVS = ["北京","天津","河北","山西","内蒙古","辽宁","吉林"
 // 年份降序：第一项是"当前招生年度"。每年 9-10 月新简章发布后，在这里加一个新年份、删掉最老的即可。
 const YEARS = [2027, 2026, 2025, 2024];
 const ALL_TAGS = ["985", "211", "双一流", "财经类", "自划线"];
+// 没有 Electron 桥 = 跑在浏览器里（网页版）。数据改在浏览器 localStorage，只对自己生效。
+const WEB_MODE = !window.api;
 
 let DATA = null;               // {national, schools}
 let FAV = new Set(JSON.parse(localStorage.getItem('fav') || '[]'));
@@ -389,6 +391,7 @@ function updateStat() {
 }
 
 async function init() {
+  if (WEB_MODE) document.body.classList.add('web-mode');
   DATA = await getApi().loadData();
   if (DATA._migration) {
     const m = DATA._migration;
