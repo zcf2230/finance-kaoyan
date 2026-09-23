@@ -28,6 +28,14 @@ python -m http.server 8471      # 在项目根目录执行
 部署：把**项目根目录**（含 `index.html`、`renderer/`、`data/`）整体上传到任意静态托管即可。
 `main.js` / `preload.js` / `package.json` / `tools/` 对网站无用，可以不传。
 
+更推荐用打包脚本生成只含必要文件的产物：
+
+```bash
+npm run build:web      # 输出 dist-web/（12 个文件 / 约 220 KB，含 _headers、robots.txt）
+```
+
+**详细的托管与备案说明见 [`DEPLOY.md`](./DEPLOY.md)。**
+
 浏览器模式与桌面版的差异（由 `body.web-mode` 控制）：
 
 | 功能 | 桌面版 | 网页版 |

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "electron .",
     "test": "node test-renderer.js && node tools/test-migration.js && node tools/test-web-mode.js",
+    "build:web": "node tools/build-web.js",
     "dist": "electron-builder --win nsis"
   },
   "build": {

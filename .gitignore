@@ -13,3 +13,4 @@ desktop.ini
 # 临时研究产物（合并后删除）
 .research/
 build.log
+dist-web/
