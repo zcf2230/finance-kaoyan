@@ -7,6 +7,7 @@
 - **账号**：zcf2230@gmail.com（Account ID `195f61883161e7da9de43293f7643f93`）
 - **项目名**：`jinrong-kaoyan`
 - 已实测：线上渲染 212 所院校 / 31 个省份分组 / 零 undefined，`_headers` 缓存策略生效。
+- **当前线上为单文件版**（首屏 1 个请求，brotli 39.7 KB）；首版多文件版因国内访问较慢已替换。
 
 ### 用命令行更新部署（已验证可用）
 
@@ -27,26 +28,30 @@ npx wrangler pages deploy dist-web --project-name=jinrong-kaoyan --branch=main -
 ## 一、打包产物
 
 ```bash
-node tools/build-web.js      # 或 npm run build:web
+npm run build:web      # 或 node tools/build-web.js
 ```
 
-输出到 `dist-web/`，**12 个文件、约 220 KB**，这就是要上传的全部内容：
+输出到 `dist-web/`，**1 个页面文件**：
 
 ```
-index.html           入口（自动跳转到 renderer/）
-renderer/index.html  应用页面
-renderer/app.js      全部逻辑
-renderer/styles.css  样式
-data/national.json   历年国家线
-data/batch1-4.json   212 所院校数据
-_headers             缓存策略（Netlify / Cloudflare Pages 会自动识别）
-robots.txt           允许搜索引擎收录
-.nojekyll            给 GitHub Pages 用，跳过 Jekyll 处理
+index.html   183.9 KB（brotli 压缩后 39.7 KB）—— CSS、JS、212 所院校数据全部内联
+_headers     缓存策略（Netlify / Cloudflare Pages 自动识别）
+robots.txt   允许搜索引擎收录
+.nojekyll    给 GitHub Pages 用，跳过 Jekyll 处理
 ```
 
-打包时会自动做数据自检（院校数、省市数），不通过会直接报错退出。
+### 为什么是单文件（2026-09-23 的优化）
 
-**所有引用都是相对路径**，放在域名根目录或子目录（如 `example.com/kaoyan/`）都能正常工作，已实测验证。
+初版是多文件（`renderer/` + `data/` 共 12 个文件）。实测发现**慢的原因不是带宽**——
+整站 brotli 压缩后只有 46 KB——**而是请求数**：首屏要发 9 个请求
+（跳转页 → 页面 → JS/CSS → 5 个 JSON），每个都得绕到境外节点，延迟层层叠加。
+
+改成单文件后首屏只需 **1 个请求**，压缩后 39.7 KB（比多文件版还小，因为省掉了 8 份响应头）。
+代价是页面不再分级缓存，所以 `_headers` 把缓存压到 5 分钟，保证数据更新能及时生效。
+
+打包时会自动做数据自检（院校数、省市数、内联是否成功），不通过会直接报错退出。
+
+> 单文件版的路径无关紧要（没有任何外部引用），放根目录或子目录都一样。
 
 ---
 

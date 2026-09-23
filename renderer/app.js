@@ -18,6 +18,9 @@ function getApi() {
   if (window.api) return window.api;
   const KEY = 'mock-kaoyan-data';
   const seed = async () => {
+    // 单文件版（tools/build-web.js 生成）会把整份数据内联到 window.__KAOYAN_DATA__，
+    // 省掉 5 次网络请求——对境外链路来说，少一次往返比少几 KB 重要得多。
+    if (window.__KAOYAN_DATA__) return JSON.parse(JSON.stringify(window.__KAOYAN_DATA__));
     const n = await (await fetch('../data/national.json')).json();
     const parts = await Promise.all([1, 2, 3, 4].map(i => fetch(`../data/batch${i}.json`).then(r => r.json())));
     return { version: 1, national: n, schools: [].concat(...parts) };
