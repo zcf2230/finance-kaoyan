@@ -1,5 +1,29 @@
 # 网页版部署说明
 
+## 〇、当前部署状态（2026-09-23）
+
+- **平台**：Cloudflare Pages（免备案）
+- **生产地址**：https://jinrong-kaoyan.pages.dev
+- **账号**：zcf2230@gmail.com（Account ID `195f61883161e7da9de43293f7643f93`）
+- **项目名**：`jinrong-kaoyan`
+- 已实测：线上渲染 212 所院校 / 31 个省份分组 / 零 undefined，`_headers` 缓存策略生效。
+
+### 用命令行更新部署（已验证可用）
+
+```bash
+npm run build:web          # 1. 重新打包到 dist-web/
+npx wrangler pages deploy dist-web --project-name=jinrong-kaoyan --branch=main --commit-dirty=true
+```
+
+首次使用需要授权（二选一）：
+
+- `npx wrangler login` —— 浏览器 OAuth，**注意：旧的授权标签页要先关掉**，否则旧回调会打到新进程上报 `query string parameter doesn't match`；
+- 或设置 `CLOUDFLARE_API_TOKEN` 环境变量（在 Cloudflare 后台「我的个人资料 → API 令牌」创建一个含 **Cloudflare Pages: Edit** 权限的令牌）。
+
+也可以在 Cloudflare 后台手动操作：项目 → **Create new deployment** → 重新拖一次 `dist-web/` 的内容。
+
+---
+
 ## 一、打包产物
 
 ```bash
