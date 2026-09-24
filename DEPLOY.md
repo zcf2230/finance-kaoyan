@@ -1,27 +1,38 @@
 # 网页版部署说明
 
-## 〇、当前部署状态（2026-09-23）
+## 〇、当前状态：已下线（2026-09-24）
 
-- **平台**：Cloudflare Pages（免备案）
-- **生产地址**：https://jinrong-kaoyan.pages.dev
-- **账号**：zcf2230@gmail.com（Account ID `195f61883161e7da9de43293f7643f93`）
-- **项目名**：`jinrong-kaoyan`
-- 已实测：线上渲染 212 所院校 / 31 个省份分组 / 零 undefined，`_headers` 缓存策略生效。
-- **当前线上为单文件版**（首屏 1 个请求，brotli 39.7 KB）；首版多文件版因国内访问较慢已替换。
+**网站已于 2026-09-24 从 Cloudflare Pages 删除，公网已无法访问**
+（`jinrong-kaoyan.pages.dev` DNS 解析返回 `Non-existent domain`，部署子域名同样失效）。
 
-### 用命令行更新部署（已验证可用）
+原因：凡宝要求下线，改为只有自己使用。
+
+### 现在怎么用
+
+**方式一（推荐）：桌面应用**
+桌面快捷方式「金融考研择校通」→ v1.1.0，内置同样的 212 所院校数据，功能更全
+（多了「导入备份」「打开数据文件夹」）。
+
+**方式二：双击单文件网页**
+`dist-web/index.html` —— 这是自包含单文件（CSS/JS/数据全内联），
+**双击用浏览器打开即可，不需要任何服务器**（已在 `file://` 协议下实测：212 所院校正常渲染）。
+可以随便复制到别的位置或发给别人。
+
+### 如果要重新上线
 
 ```bash
-npm run build:web          # 1. 重新打包到 dist-web/
+npm run build:web
+npx wrangler pages project create jinrong-kaoyan --production-branch=main
 npx wrangler pages deploy dist-web --project-name=jinrong-kaoyan --branch=main --commit-dirty=true
 ```
 
-首次使用需要授权（二选一）：
+两条命令，约 30 秒。
 
-- `npx wrangler login` —— 浏览器 OAuth，**注意：旧的授权标签页要先关掉**，否则旧回调会打到新进程上报 `query string parameter doesn't match`；
-- 或设置 `CLOUDFLARE_API_TOKEN` 环境变量（在 Cloudflare 后台「我的个人资料 → API 令牌」创建一个含 **Cloudflare Pages: Edit** 权限的令牌）。
+### 如果要「在线但只有自己能看」
 
-也可以在 Cloudflare 后台手动操作：项目 → **Create new deployment** → 重新拖一次 `dist-web/` 的内容。
+用 **Cloudflare Access**（Zero Trust，免费额度 50 个用户）给 Pages 项目加访问策略，
+只有指定邮箱能进，访问时会要求邮箱验证码。适合需要在手机/多设备上看的场景。
+入口：Cloudflare 后台 → Zero Trust → Access → Applications → Add an application → Self-hosted。
 
 ---
 
