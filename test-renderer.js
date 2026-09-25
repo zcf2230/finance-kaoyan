@@ -72,6 +72,22 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   check('数三筛选含清华/北大', ['清华大学', '北京大学'].every(n => mMath3.includes(n)));
   check('数三筛选不含人大（人大专硕考 396）', !mMath3.includes('中国人民大学'));
 
+  // 4b-2. 复合值「数三或396（分学院）」应该两个筛选都能命中
+  //       （当前数据里没有这种值，所以临时造一所来守这条规则）
+  window.openEditor(null);
+  const compId = 'test-comp-' + Date.now();
+  window.document.querySelector('#eName').value = '测试复合数学';
+  window.document.querySelector('[data-p="z"][data-k="m"]').value = '数三或396（分学院）';
+  window.saveEditor(compId);
+  for (const [val, label] of [['数三', '考数学三'], ['396', '考396']]) {
+    window.document.querySelector('#fMath').value = val;
+    window.document.querySelector('#fMath').dispatchEvent(new window.Event('change'));
+    const names = [...window.document.querySelectorAll('.school-name')].map(e => e.textContent);
+    check(`复合值「数三或396（分学院）」能被「${label}」筛选命中`, names.includes('测试复合数学'));
+  }
+  window.document.querySelector('#fMath').value = '';
+  window.document.querySelector('#fMath').dispatchEvent(new window.Event('change'));
+
   // 4c. PDF/官方公告里补的数据要守住
   const hb = schools.find(s => s.name === '华北电力大学');
   check('华北电力大学已补 2026 专硕复试线 356', !!hb && hb.z.l && hb.z.l['2026'] === 356);

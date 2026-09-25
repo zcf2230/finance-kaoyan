@@ -214,10 +214,12 @@ function filteredSchools() {
     if (math) {
       const p = s[progKey] || {};
       const m = p.m || '';
-      // ⚠️ 不能用 m.includes('数三')：值是「303数学三」，字符是 数+学+三，
+      // ⚠️ 不能用 m.includes('数三') 判「考数学三」：值是「303数学三」，字符是 数+学+三，
       // 不含连续的「数三」子串——这曾导致「考数学三」筛选命中 0 所（应为 113 所）。
+      // 但「数三或396（分学院）」这个复合值里确实含连续的「数三」，所以三种写法都要覆盖：
+      // 这样复合值在「考数学三」和「考396」两个筛选里都能命中（分学院两种都考）。
       const is396 = m.includes('396');
-      const isMath3 = m.includes('303') || m.includes('数学三');
+      const isMath3 = m.includes('303') || m.includes('数学三') || m.includes('数三');
       if (math === '396') { if (!is396) return false; }
       else if (math === '数三') { if (!isMath3) return false; }
     }
