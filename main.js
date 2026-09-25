@@ -6,7 +6,7 @@ const crypto = require('crypto');
 let win = null;
 
 // 内置数据版本：每次批量更新 data/*.json 后 +1，安装版启动时会自动迁移到新数据
-const DATA_VERSION = 4;
+const DATA_VERSION = 5;
 // v1.0.0 内置 schools 的指纹（无 dataVersion 的老数据靠它判断"用户有没有改过"）
 const LEGACY_SEED_HASH = 'ea5d8b2c8b26bbea77939ce8a939a61b';
 

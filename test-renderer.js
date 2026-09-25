@@ -231,6 +231,26 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   const firstName = window.document.querySelector('.school-name').textContent;
   check('按复试线排序第一名是南京大学或清华大学', ['南京大学', '清华大学'].includes(firstName));
 
+  // 18. parseCount 单元用例
+  //     背景：这些字段是自由文本，旧实现直接取第一个数字，实测 81 条里 80 条取到的是**年份**
+  //     （「2026年统考招生计划36人」→ 2026），导致「录取人数」排序等于没排、报录比算错。
+  const pc = window.parseCount;
+  const pcCases = [
+    ['2026年统考招生计划36人（原目录公布35人，复试阶段调整为36）', 36, '年份在前'],
+    ['2026年经济学院应用经济学：报名64人、达国家线24人、推免5人、录取14人', 14, '推免数字在前'],
+    ['2026年国际商学院025100金融全日制招生计划23人（含已录取推免3人），复试人数24人', 23, '推免干扰'],
+    ['2026年财经学院金融专硕全日制统考报考24人、录取10人', 10, '报考人数在前'],
+    ['2025年安泰金融专硕入围复试29人、拟录取21人（最高391、最低340）', 21, '复试人数在前'],
+    ['2026年一志愿进入复试最低357分、最高415分；拟录取34人，另列15名候补', 34, '含分数干扰'],
+    ['020204金融学2026年计划招生25人（已接收推免12人），等额复试', 25, '专业代码干扰'],
+    ['2026年统考报名487人', 487, '报名人数'],
+    ['待核实', null, '无数字'],
+    ['2026年推免拟录取10人', null, '全是推免']
+  ];
+  for (const [txt, exp, label] of pcCases) {
+    check(`parseCount：${label}`, pc(txt) === exp);
+  }
+
   const fails = results.filter(r => r[0] === 'FAIL');
   for (const [s, n] of results) console.log(s, '-', n);
   console.log(fails.length ? `\n${fails.length} 项失败` : '\n全部通过 ✔');

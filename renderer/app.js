@@ -118,10 +118,34 @@ function parseLineVal(p) {
   if (p.la) { const m = String(p.la).match(/(\d{3})/); if (m) return parseInt(m[1]); }
   return null;
 }
+/**
+ * 从「录取人数 / 报名人数」文本里取数字。
+ *
+ * ⚠️ 不能直接取第一个数字。这些字段是自由文本，实测 81 条里 80 条的首个数字是**年份**，
+ * 例如「2026年统考招生计划36人」→ 会解析成 2026。后果：
+ *   ·「录取人数 多→少」排序实际按年份排（等于没排）
+ *   · 报录比用错数字算出来是假的
+ * 还有「020204金融学…计划招生25人」这种，首个数字是专业代码。
+ *
+ * 策略：只认「数字 + 人/名」这种计人单位（天然排除年份、专业代码、分数），
+ * 排除「推免/保研」前面的数（那不算统考录取），再按 录取 > 招生/计划 > 任意 的优先级取。
+ */
 function parseCount(str) {
   if (!str) return null;
-  const m = String(str).match(/([\d.]+)/);
-  return m ? parseFloat(m[1]) : null;
+  const s = String(str);
+  const cands = [...s.matchAll(/(\d+(?:\.\d+)?)\s*[人名]/g)]
+    .map(m => ({
+      v: parseFloat(m[1]),
+      // 判定「是不是推免数」只看紧邻的 5 个字，否则会把
+      // 「推免5人、录取14人」里的 14 也误杀（窗口太宽会连前面的推免一起圈进来）
+      near: s.slice(Math.max(0, m.index - 5), m.index),
+      before: s.slice(Math.max(0, m.index - 10), m.index)
+    }))
+    .filter(c => !/推免|保研/.test(c.near));
+  if (!cands.length) return null;
+  const pick = kws => cands.find(c => kws.some(k => c.before.includes(k)));
+  const hit = pick(['录取']) || pick(['招生', '拟招', '计划', '指标']) || cands[0];
+  return hit.v;
 }
 function ratioText(p) {
   const e = parseCount(p.e), a = parseCount(p.a);
