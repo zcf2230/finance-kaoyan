@@ -152,12 +152,16 @@ ipcMain.handle('data:openDir', () => {
 });
 
 function createWindow() {
+  // 打包后任务栏图标来自 exe 内嵌图标（electron-builder 用 build/icon.png 生成）；
+  // 这里额外指定是为了让 npm start 的开发模式也有正确图标。
+  const iconPath = path.join(__dirname, 'build', 'icon.png');
   win = new BrowserWindow({
     width: 1440,
     height: 920,
     minWidth: 1100,
     minHeight: 700,
     title: '金融考研择校通',
+    icon: fs.existsSync(iconPath) ? iconPath : undefined,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
