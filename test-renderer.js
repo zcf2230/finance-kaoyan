@@ -62,6 +62,25 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   check('396 筛选含人大/央财/贸大', ['中国人民大学', '中央财经大学', '对外经济贸易大学'].every(n => m396.includes(n)));
   check('396 筛选不含清华', !m396.includes('清华大学'));
 
+  // 4b. 数三筛选 —— 这里曾经有个从 v1.0.0 起就存在的严重 bug：
+  //     判据写成 m.includes('数三')，但值是「303数学三」（数+学+三），不含连续子串「数三」，
+  //     导致「考数学三」筛选命中 0 所（应为 113 所）。必须守住这条断言。
+  window.document.querySelector('#fMath').value = '数三';
+  window.document.querySelector('#fMath').dispatchEvent(new window.Event('change'));
+  const mMath3 = [...window.document.querySelectorAll('.school-name')].map(e => e.textContent);
+  check('「考数学三」筛选有结果（曾错误地命中 0 所）', mMath3.length > 50);
+  check('数三筛选含清华/北大', ['清华大学', '北京大学'].every(n => mMath3.includes(n)));
+  check('数三筛选不含人大（人大专硕考 396）', !mMath3.includes('中国人民大学'));
+
+  // 4c. PDF/官方公告里补的数据要守住
+  const hb = schools.find(s => s.name === '华北电力大学');
+  check('华北电力大学已补 2026 专硕复试线 356', !!hb && hb.z.l && hb.z.l['2026'] === 356);
+  check('华北电力大学已补 2026 学硕复试线 351', !!hb && hb.x && hb.x.l && hb.x.l['2026'] === 351);
+  const bs = schools.find(s => s.name === '北京师范大学');
+  check('北京师范大学学费已补（7万/全程）', !!bs && bs.z.f === '7万/全程');
+  const hd = schools.find(s => s.name === '华东师范大学');
+  check('华东师范大学初试数学已更正为 396', !!hd && hd.z.m === '396经济类综合');
+
   // 5. 详情弹窗
   window.document.querySelector('#fMath').value = '';
   window.document.querySelector('#fMath').dispatchEvent(new window.Event('change'));

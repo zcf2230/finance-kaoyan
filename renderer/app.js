@@ -214,8 +214,12 @@ function filteredSchools() {
     if (math) {
       const p = s[progKey] || {};
       const m = p.m || '';
-      if (math === '396') { if (!m.includes('396')) return false; }
-      else if (math === '数三') { if (!m.includes('数三') || m.includes('396')) return false; }
+      // ⚠️ 不能用 m.includes('数三')：值是「303数学三」，字符是 数+学+三，
+      // 不含连续的「数三」子串——这曾导致「考数学三」筛选命中 0 所（应为 113 所）。
+      const is396 = m.includes('396');
+      const isMath3 = m.includes('303') || m.includes('数学三');
+      if (math === '396') { if (!is396) return false; }
+      else if (math === '数三') { if (!isMath3) return false; }
     }
     if (complete) {
       const p = s[progKey] || {};
