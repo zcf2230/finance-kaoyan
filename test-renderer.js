@@ -251,6 +251,26 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
     check(`parseCount：${label}`, pc(txt) === exp);
   }
 
+  // 19. parseLineVal 单元用例
+  //     两个坑：① 多年数据用 Math.max 会导致「卡片显示最新年、排序按最高年」不一致；
+  //             ② 约数里带年份（「国家线（2026年A类324）」）直接取 3 位数会拿到 202。
+  const pl = window.parseLineVal;
+  const plCases = [
+    [{ l: { 2025: 333, 2026: 324 } }, 324, '多年数据取最新年'],
+    [{ l: { 2025: 365, 2026: 380 } }, 380, '多年数据取最新年（2）'],
+    [{ la: '国家线（2026年A类324）' }, 324, '剥掉年份'],
+    [{ la: '按B类地区分数线执行（2026年B区国家线314）' }, 314, '剥掉年份（B区）'],
+    [{ la: 'B区国家线附近（2026年B区国家线314）' }, 314, '剥掉年份（B区附近）'],
+    [{ la: '360-380' }, 360, '区间取第一个'],
+    [{ la: '390+' }, 390, '带加号'],
+    [{ la: '国家线附近' }, null, '纯中文返回 null'],
+    [{ la: '国家线-350' }, 350, '带国家线前缀'],
+    [{}, null, '空对象']
+  ];
+  for (const [p, exp, label] of plCases) {
+    check(`parseLineVal：${label}`, pl(p) === exp);
+  }
+
   const fails = results.filter(r => r[0] === 'FAIL');
   for (const [s, n] of results) console.log(s, '-', n);
   console.log(fails.length ? `\n${fails.length} 项失败` : '\n全部通过 ✔');

@@ -113,9 +113,28 @@ function feeIsPerYear(p) {
   const f = String((p || {}).f || '');
   return isFinite(parseFeeWan(f)) && !/全程|总额|合计/.test(f);
 }
+/**
+ * 取一所院校「用于排序和分数匹配」的复试线数值。
+ *
+ * ⚠️ 两个坑（都踩过）：
+ * 1) 有多年数据时不能用 Math.max——那会让「卡片显示 2026 年的 324、排序却按 2025 年的 333」
+ *    （中国海洋大学学硕就是这样）。要跟 lineCell 一致，取**最新年份**。
+ * 2) 约数里常带年份，如「国家线（2026年A类324）」——直接 match(/(\d{3})/) 会取到年份里的
+ *    「202」，实测 6 条记录因此被当成 202 分沉到排序末尾。必须先剥掉年份再取数。
+ */
 function parseLineVal(p) {
-  if (p.l) { const ys = YEARS.map(y => p.l[y]).filter(v => v > 0); if (ys.length) return Math.max(...ys); }
-  if (p.la) { const m = String(p.la).match(/(\d{3})/); if (m) return parseInt(m[1]); }
+  if (p.l) {
+    const y = YEARS.find(y => p.l[y] > 0);      // YEARS 是降序，第一个命中的就是最新年份
+    if (y) return p.l[y];
+  }
+  if (p.la) {
+    const s = String(p.la);
+    const cleaned = s.replace(/(19|20)\d{2}/g, ' ');   // 先剥掉年份
+    const nums = [...cleaned.matchAll(/\d+/g)].map(m => parseInt(m[0], 10));
+    const hit = nums.find(v => v >= 200 && v <= 500);  // 分数线合理区间
+    if (hit) return hit;
+    if (nums.length) return nums[0];
+  }
   return null;
 }
 /**
