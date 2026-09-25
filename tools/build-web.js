@@ -78,9 +78,23 @@ function copyDir(src, dest) {
   }
 }
 
+/**
+ * 清空输出目录。
+ * ⚠️ 不能用 fs.rmSync(dir, {recursive:true}) —— 本环境的 safe-delete 会把递归删目录
+ * 拦下来并抛错（"Some operations were aborted"）。改成逐个 unlink 文件、再 rmdir 空目录。
+ */
+function cleanDir(dir) {
+  if (!fs.existsSync(dir)) return;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) { cleanDir(p); try { fs.rmdirSync(p); } catch (_) {} }
+    else { try { fs.unlinkSync(p); } catch (_) {} }
+  }
+}
+
 function main() {
-  fs.rmSync(OUT, { recursive: true, force: true });
   fs.mkdirSync(OUT, { recursive: true });
+  cleanDir(OUT);
 
   const data = readData();
   const html = buildSingleFile(data);

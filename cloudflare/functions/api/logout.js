@@ -7,7 +7,8 @@ export async function onRequestPost({ request }) {
   return new Response(null, {
     status: 302,
     headers: {
-      'Location': url.origin + '/login.html',
+      // 用 /login 而不是 /login.html：Pages 的 clean URLs 会把 .html 再 308 一次
+      'Location': url.origin + '/login',
       'Set-Cookie': 'kb_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0'
     }
   });

@@ -32,7 +32,12 @@ function readCookie(req, name) {
 }
 
 // 这些路径不需要登录
-const PUBLIC = new Set(['/login.html', '/api/login', '/robots.txt', '/favicon.ico']);
+// ⚠️ 必须同时放行 /login 和 /login.html：
+// Cloudflare Pages 有 clean URLs 特性，会把 /login.html 308 重定向到 /login。
+// 如果只放行 /login.html，就会形成死循环：
+//   / → 302 /login.html → 308 /login → 中间件不放行 /login → 302 /login.html → …
+// 浏览器报 ERR_TOO_MANY_REDIRECTS。（curl 默认不跟随跳转，所以测不出来，必须用 -L 测）
+const PUBLIC = new Set(['/login', '/login.html', '/api/login', '/robots.txt', '/favicon.ico']);
 
 export async function onRequest(context) {
   const { request, env, next } = context;
@@ -56,5 +61,6 @@ export async function onRequest(context) {
       status: 401, headers: { 'Content-Type': 'application/json; charset=utf-8' }
     });
   }
-  return Response.redirect(url.origin + '/login.html', 302);
+  // 跳到 /login（不带 .html）——用 Pages 的 canonical 地址，避免多一次 308 跳转
+  return Response.redirect(url.origin + '/login', 302);
 }

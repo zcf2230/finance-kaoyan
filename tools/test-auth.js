@@ -31,17 +31,30 @@ const req = (pathname, opts = {}) => new Request(ORIGIN + pathname, opts);
 
   // ---- 1. 未登录访问应用 → 跳登录页 ----
   let r = await mw.onRequest(ctx(req('/')));
-  check('未登录访问 / → 302 跳登录页', r.status === 302 && r.headers.get('Location') === ORIGIN + '/login.html');
+  check('未登录访问 / → 302 跳登录页', r.status === 302 && r.headers.get('Location') === ORIGIN + '/login');
 
   r = await mw.onRequest(ctx(req('/index.html')));
   check('未登录访问 /index.html → 302', r.status === 302);
 
   // ---- 2. 公开路径放行 ----
+  // ⚠️ 必须同时放行 /login 和 /login.html：Cloudflare Pages 的 clean URLs 会把
+  //    /login.html 308 重定向到 /login。只放行一个就会死循环（浏览器 ERR_TOO_MANY_REDIRECTS）。
+  r = await mw.onRequest(ctx(req('/login')));
+  check('登录页 /login 放行（Pages canonical 地址）', r.status === 200 && (await r.text()) === 'APP_CONTENT');
+
   r = await mw.onRequest(ctx(req('/login.html')));
-  check('登录页本身放行', r.status === 200 && (await r.text()) === 'APP_CONTENT');
+  check('登录页 /login.html 也放行', r.status === 200 && (await r.text()) === 'APP_CONTENT');
 
   r = await mw.onRequest(ctx(req('/robots.txt')));
   check('robots.txt 放行', r.status === 200);
+
+  // ---- 2b. 模拟「未登录 → 跳转 → 落到登录页」的完整链路，确认不会来回跳 ----
+  {
+    const first = await mw.onRequest(ctx(req('/')));
+    const target = new URL(first.headers.get('Location')).pathname;   // 中间件跳去哪
+    const second = await mw.onRequest(ctx(req(target)));              // 落到那个地址会怎样
+    check('跳转链路不循环：落到 ' + target + ' 后直接放行', second.status === 200);
+  }
 
   // ---- 3. 未登录访问接口 → 401 JSON ----
   r = await mw.onRequest(ctx(req('/api/logout')));
@@ -95,7 +108,7 @@ const req = (pathname, opts = {}) => new Request(ORIGIN + pathname, opts);
 
   // ---- 10. 退出登录 ----
   r = await logout.onRequestPost(ctx(req('/api/logout', { method: 'POST' })));
-  check('退出 → 302 回登录页', r.status === 302 && r.headers.get('Location') === ORIGIN + '/login.html');
+  check('退出 → 302 回登录页', r.status === 302 && r.headers.get('Location') === ORIGIN + '/login');
   check('退出清除 Cookie（Max-Age=0）', /Max-Age=0/.test(r.headers.get('Set-Cookie') || ''));
 
   // ---- 11. 登录接口不接受 GET ----
