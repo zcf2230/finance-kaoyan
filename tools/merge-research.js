@@ -81,19 +81,22 @@ function main() {
   const index = new Map();
   batchData.forEach((arr, bi) => arr.forEach((s, si) => index.set(s.id, { bi, si })));
 
-  const files = fs.readdirSync(RESEARCH).filter(f => /^region-.*\.json$/.test(f)).sort();
-  if (!files.length) { console.error('没有找到 .research/region-*.json'); process.exit(1); }
+  // 整校记录：region-*.json（分区域调研）+ sparse-fix.json（补稀疏院校）
+  const files = fs.readdirSync(RESEARCH).filter(f => /^(region-.*|sparse-fix)\.json$/.test(f)).sort();
+  if (!files.length) { console.error('没有找到 .research/region-*.json 或 sparse-fix.json'); process.exit(1); }
 
   let updated = 0, added = 0;
-  const seen = new Set();
   for (const f of files) {
     for (const rec of readJson(path.join(RESEARCH, f))) {
-      if (seen.has(rec.id)) { console.warn('跳过重复 id:', rec.id); continue; }
-      seen.add(rec.id);
+      // 不做全局去重：后面的文件（如 sparse-fix.json）本来就是用来**更新**前面已收录的院校的。
+      // 重复 id 会走 index 命中 → 合并分支，不会重复添加。
       const hit = index.get(rec.id);
       if (hit) {
         const bi = hit.bi, si = hit.si;
-        batchData[bi][si] = mergeSchool(batchData[bi][si], rec);
+        const s = mergeSchool(batchData[bi][si], rec);
+        // 确认不招金融硕士：用调研结论直接替换旧的备注（旧备注此时是错的）
+        if (rec.noFinance) { s.note = rec.note; s.noFinance = true; }
+        batchData[bi][si] = s;
         updated++;
       } else {
         const b = PROV_BATCH[rec.prov];
@@ -115,13 +118,14 @@ function main() {
 
   console.log(`调研文件 ${files.length} 个：更新 ${updated} 所，新增 ${added} 所，合计 ${batchData.reduce((n, a) => n + a.length, 0)} 所`);
 
-  // 补充字段补丁（只含 id + 部分字段，例如 bk-emp.json 的参考书目/就业口碑）
-  const patchFile = path.join(RESEARCH, 'bk-emp.json');
-  if (fs.existsSync(patchFile)) {
+  // 字段补丁（只含 id + 部分字段，例如参考书目 / 就业口碑）
+  for (const name of ['bk-emp.json', 'bk-emp-2.json']) {
+    const patchFile = path.join(RESEARCH, name);
+    if (!fs.existsSync(patchFile)) continue;
     let patched = 0;
     for (const rec of readJson(patchFile)) {
       const hit = index.get(rec.id);
-      if (!hit) { console.warn('补丁找不到院校:', rec.id); continue; }
+      if (!hit) { console.warn(name + ' 补丁找不到院校:', rec.id); continue; }
       const s = batchData[hit.bi][hit.si];
       for (const k of ['z', 'x']) {
         if (!rec[k]) continue;
@@ -132,7 +136,43 @@ function main() {
       }
       patched++;
     }
-    console.log(`bk-emp.json 补丁：${patched} 所`);
+    console.log(`${name} 补丁：${patched} 所`);
+  }
+
+  // 人工校正（tools/data-corrections.json）
+  // 合并的 tags 是取并集、只加不减，所以"调研标错了标签"这类错误无法靠重新合并消除，
+  // 必须在这里显式声明，保证每次重跑结果都一致。
+  const corrFile = path.join(__dirname, 'data-corrections.json');
+  if (fs.existsSync(corrFile)) {
+    const corr = readJson(corrFile);
+    let removed = 0, retagged = 0;
+
+    if (Array.isArray(corr.deleteSchools) && corr.deleteSchools.length) {
+      for (let bi = 0; bi < batchData.length; bi++) {
+        const before = batchData[bi].length;
+        batchData[bi] = batchData[bi].filter(s => !corr.deleteSchools.includes(s.id));
+        removed += before - batchData[bi].length;
+      }
+      index.clear();
+      batchData.forEach((arr, bi) => arr.forEach((s, si) => index.set(s.id, { bi, si })));
+    }
+
+    for (const [id, tags] of Object.entries(corr.removeTags || {})) {
+      const hit = index.get(id);
+      if (!hit) { console.warn('校正表找不到院校:', id); continue; }
+      const s = batchData[hit.bi][hit.si];
+      s.tags = (s.tags || []).filter(t => !tags.includes(t));
+      retagged++;
+    }
+
+    for (const [id, text] of Object.entries(corr.appendNote || {})) {
+      const hit = index.get(id);
+      if (!hit) continue;
+      const s = batchData[hit.bi][hit.si];
+      if (!(s.note || '').includes(text)) s.note = [s.note, text].filter(Boolean).join('；');
+    }
+
+    console.log(`人工校正：删除 ${removed} 条重复记录、修正 ${retagged} 所标签`);
   }
 
   if (DRY) { console.log('--dry 模式，未写入'); return; }

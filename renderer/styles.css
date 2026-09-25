@@ -1,29 +1,48 @@
+/* ============================================================
+   金融考研择校通 · 样式表
+   颜色统一走 CSS 变量，深色模式只需重定义变量（见文件末尾）
+   对比度均按 WCAG AA（正文 ≥4.5:1）取值，改色前请先验算
+   ============================================================ */
 :root {
   --bg: #f5f7fa;
   --card: #ffffff;
   --line: #e5e9f0;
   --text: #1f2d3d;
-  --muted: #7f8fa4;
+  --muted: #5b6b80;          /* 5.44:1 白底 / 5.07:1 页面底 */
   --brand: #1a5fb4;
   --brand-light: #eaf2fc;
-  --gold: #b7791f;
+  --gold: #8a5a10;           /* 5.38:1 米色底 */
+  --gold-bg: #fdf3e3;
   --danger: #c0392b;
+
+  --input-bg: #ffffff;
+  --th-bg: #f0f4f9;
+  --th-text: #4a5b70;
+  --hover-bg: #fafbfd;
+  --sidebar-bg: #16283f;
+  --sidebar-text: #cfd8e3;
+  --sidebar-muted: #8fa3b8;  /* 5.75:1 深蓝底 */
+  --sidebar-hover: rgba(255,255,255,.08);
+  --toast-bg: #16283f;
+  --toast-text: #ffffff;
+  --mask: rgba(15,25,40,.45);
+  --shadow: rgba(0,0,0,.2);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
 #app { display: flex; height: 100vh; }
 
 /* ---------- 侧栏 ---------- */
-#sidebar { width: 210px; background: #16283f; color: #cfd8e3; flex-shrink: 0; display: flex; flex-direction: column; }
+#sidebar { width: 210px; background: var(--sidebar-bg); color: var(--sidebar-text); flex-shrink: 0; display: flex; flex-direction: column; }
 .logo { display: flex; gap: 10px; align-items: center; padding: 20px 16px 16px; }
 .logo-icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #1a5fb4, #4a90d9); color: #fff; font-size: 22px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 .logo-title { font-size: 15px; color: #fff; font-weight: bold; }
-.logo-sub { font-size: 11px; color: #8fa3b8; margin-top: 2px; }
+.logo-sub { font-size: 11px; color: var(--sidebar-muted); margin-top: 2px; }
 nav { display: flex; flex-direction: column; padding: 8px; gap: 4px; }
-.nav-btn { text-align: left; padding: 11px 14px; border: none; background: transparent; color: #cfd8e3; font-size: 14px; border-radius: 8px; cursor: pointer; }
-.nav-btn:hover { background: rgba(255,255,255,.08); }
+.nav-btn { text-align: left; padding: 11px 14px; border: none; background: transparent; color: var(--sidebar-text); font-size: 14px; border-radius: 8px; cursor: pointer; }
+.nav-btn:hover { background: var(--sidebar-hover); }
 .nav-btn.active { background: var(--brand); color: #fff; }
-.sidebar-foot { margin-top: auto; padding: 14px 16px; font-size: 11px; color: #6d8199; line-height: 1.7; }
+.sidebar-foot { margin-top: auto; padding: 14px 16px; font-size: 12px; color: var(--sidebar-muted); line-height: 1.7; }
 
 /* ---------- 主区 ---------- */
 #main { flex: 1; overflow-y: auto; padding: 22px 26px; }
@@ -35,7 +54,7 @@ nav { display: flex; flex-direction: column; padding: 8px; gap: 4px; }
 /* ---------- 筛选栏 ---------- */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; align-items: center; }
 .filters input[type=search] { flex: 1 1 200px; min-width: 170px; }
-.filters input, .filters select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: #fff; color: var(--text); outline: none; }
+.filters input, .filters select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: var(--input-bg); color: var(--text); outline: none; }
 .filters input:focus, .filters select:focus { border-color: var(--brand); }
 .chk { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 13px; cursor: pointer; white-space: nowrap; }
 
@@ -44,42 +63,51 @@ nav { display: flex; flex-direction: column; padding: 8px; gap: 4px; }
 .prov-head small { color: var(--muted); font-weight: normal; }
 .school { background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
 .school-head { display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; }
-.school-head:hover { background: #fafbfd; }
+.school-head:hover { background: var(--hover-bg); }
 .school-name { font-size: 15px; font-weight: bold; }
 .school-city { color: var(--muted); font-size: 12px; }
-.tag { font-size: 11px; padding: 2px 7px; border-radius: 20px; background: var(--brand-light); color: var(--brand); }
-.tag.caijing { background: #fdf3e3; color: var(--gold); }
+.tag { font-size: 12px; padding: 2px 7px; border-radius: 20px; background: var(--brand-light); color: var(--brand); }
+.tag.caijing { background: var(--gold-bg); color: var(--gold); }
 .star { margin-left: auto; background: none; border: none; font-size: 18px; cursor: pointer; color: #c9d2de; }
 .star.on { color: #f5a623; }
-.program { display: grid; grid-template-columns: 86px repeat(5, 1fr); gap: 6px 12px; padding: 9px 14px; border-top: 1px dashed var(--line); font-size: 13px; align-items: center; }
+.program { display: grid; grid-template-columns: 86px repeat(4, 1fr); gap: 6px 12px; padding: 9px 14px; border-top: 1px dashed var(--line); font-size: 13px; align-items: center; }
 .program .p-name { font-weight: bold; color: var(--brand); }
-.program .cell b { font-weight: normal; color: var(--muted); display: block; font-size: 11px; margin-bottom: 2px; }
+.program .cell b { font-weight: normal; color: var(--muted); display: block; font-size: 12px; margin-bottom: 2px; }
 .program .cell span { display: block; }
 .warn { color: var(--gold); }
 .empty-tip { text-align: center; color: var(--muted); padding: 60px 0; }
 
+/* 确认不招金融硕士的院校 */
+.school.nofin { opacity: .72; }
+.badge-nofin { font-size: 12px; padding: 2px 8px; border-radius: 20px; background: #fdecea; color: var(--danger); border: 1px solid #f5c6c0; }
+.alert { background: #fdecea; border: 1px solid #f5c6c0; color: #8c2f22; border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.7; margin-bottom: 12px; }
+
 /* ---------- 按钮 ---------- */
-button { padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px; color: var(--text); }
+button { padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--input-bg); cursor: pointer; font-size: 13px; color: var(--text); }
 button:hover { border-color: var(--brand); color: var(--brand); }
 button.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
 button.primary:hover { background: #144a92; color: #fff; }
 button.danger { color: var(--danger); }
 button.danger:hover { border-color: var(--danger); background: #fdf0ee; color: var(--danger); }
-.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+button.mini { padding: 4px 10px; font-size: 12px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; align-items: center; }
+.toolbar input[type=search] { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: var(--input-bg); color: var(--text); outline: none; min-width: 220px; }
+.toolbar input[type=search]:focus { border-color: var(--brand); }
+.toolbar .count { color: var(--muted); font-size: 12px; margin-left: auto; }
 
 /* ---------- 表格 ---------- */
 table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
 th, td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--line); }
-th { background: #f0f4f9; color: #4a5b70; font-weight: bold; }
+th { background: var(--th-bg); color: var(--th-text); font-weight: bold; }
 tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: #fafbfd; }
+tbody tr:hover { background: var(--hover-bg); }
 td .rowbtns button { padding: 4px 10px; margin-right: 6px; font-size: 12px; }
 
 /* ---------- 弹窗 ---------- */
-.modal-mask { position: fixed; inset: 0; background: rgba(15,25,40,.45); z-index: 100; display: flex; align-items: center; justify-content: center; }
-.modal { background: #fff; border-radius: 14px; width: 760px; max-width: 92vw; max-height: 86vh; overflow-y: auto; padding: 24px; }
-.modal.wide { width: 980px; }
-.modal h3 { font-size: 17px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+.modal-mask { position: fixed; inset: 0; background: var(--mask); z-index: 100; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--card); border-radius: 14px; width: 760px; max-width: 92vw; max-height: 86vh; overflow-y: auto; padding: 24px; }
+.modal.wide { width: 1040px; }
+.modal h3 { font-size: 17px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .modal .close-x { margin-left: auto; }
 .detail-sec { margin-bottom: 14px; }
 .detail-sec h4 { font-size: 13px; color: var(--brand); margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--line); }
@@ -95,7 +123,7 @@ td .rowbtns button { padding: 4px 10px; margin-right: 6px; font-size: 12px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
 .form-grid .full { grid-column: 1 / -1; }
 .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.field input, .field select, .field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; }
+.field input, .field select, .field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--input-bg); color: var(--text); }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--brand); outline: none; }
 fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
 legend { font-size: 13px; color: var(--brand); font-weight: bold; padding: 0 6px; }
@@ -104,22 +132,94 @@ legend { font-size: 13px; color: var(--brand); font-weight: bold; padding: 0 6px
 .form-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
 
 /* ---------- 对比 ---------- */
-#compareBar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #16283f; color: #fff; border-radius: 30px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; z-index: 90; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+#compareBar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); color: var(--toast-text); border-radius: 30px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; z-index: 90; box-shadow: 0 6px 20px var(--shadow); }
 #compareList span { margin-right: 8px; font-size: 13px; }
 #compareList span i { font-style: normal; cursor: pointer; opacity: .7; margin-left: 3px; }
 .cmp-table th { background: var(--brand-light); color: var(--brand); }
-.cmp-table td:first-child { color: var(--muted); width: 110px; }
+.cmp-table td:first-child { color: var(--muted); width: 96px; }
+.cmp-table td { vertical-align: top; }
+.cmp-table .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.cmp-table .clamp.open { -webkit-line-clamp: unset; }
+.cmp-table .more { font-size: 12px; color: var(--brand); cursor: pointer; white-space: nowrap; }
+
+/* ---------- 分数匹配 ---------- */
+.matcher { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.matcher .f { display: flex; flex-direction: column; gap: 4px; }
+.matcher label { font-size: 12px; color: var(--muted); }
+.matcher input, .matcher select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: var(--input-bg); color: var(--text); outline: none; width: 110px; }
+.matcher input:focus, .matcher select:focus { border-color: var(--brand); }
+.matcher .hint { font-size: 12px; color: var(--muted); margin-left: auto; }
+.match-badge { font-size: 12px; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.match-chong { background: #fdecea; color: #a33224; }
+.match-wen { background: #e8f3e8; color: #2c6b34; }
+.match-bao { background: var(--brand-light); color: var(--brand); }
+.match-none { background: var(--th-bg); color: var(--muted); }
 
 /* ---------- Toast ---------- */
-#toast { position: fixed; top: 26px; left: 50%; transform: translateX(-50%); background: #16283f; color: #fff; padding: 10px 22px; border-radius: 8px; z-index: 200; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+#toast { position: fixed; top: 26px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); color: var(--toast-text); padding: 10px 22px; border-radius: 8px; z-index: 200; font-size: 13px; box-shadow: 0 4px 14px var(--shadow); }
 
 /* ---------- 网页版 / 桌面版差异 ---------- */
-/* 跑在浏览器里时 body 会带 .web-mode：隐藏只在桌面应用里有意义的元素 */
 body.web-mode .web-hide { display: none !important; }
 body:not(.web-mode) .web-only { display: none !important; }
 
 /* ---------- 超宽显示器 ---------- */
-/* 桌面应用窗口是 1440 宽，但浏览器可能铺满 2K/4K 屏，限制内容宽度避免卡片被拉得过长 */
 @media (min-width: 1680px) {
   #main > .view { max-width: 1360px; margin-left: auto; margin-right: auto; }
+}
+
+/* ============================================================
+   深色模式：跟随系统。只重定义变量 + 少数写死的颜色
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14181f;
+    --card: #1c222c;
+    --line: #2b3441;
+    --text: #e3e9f2;
+    --muted: #9aa9bd;
+    --brand: #6aa8f0;
+    --brand-light: #1e3050;
+    --gold: #e0a94a;
+    --gold-bg: #3a2f16;
+    --danger: #f08a7c;
+
+    --input-bg: #232b36;
+    --th-bg: #232b36;
+    --th-text: #b9c6d6;
+    --hover-bg: #232b36;
+    --sidebar-bg: #10141a;
+    --sidebar-text: #cfd8e3;
+    --sidebar-muted: #93a6bc;
+    --sidebar-hover: rgba(255,255,255,.08);
+    --toast-bg: #2b3441;
+    --toast-text: #e3e9f2;
+    --mask: rgba(0,0,0,.6);
+    --shadow: rgba(0,0,0,.5);
+  }
+  .badge-nofin { background: #3a1f1c; color: #f08a7c; border-color: #5c2f28; }
+  .alert { background: #3a1f1c; border-color: #5c2f28; color: #f3b3a7; }
+  button.primary:hover { background: #4a8ad4; }
+  button.danger:hover { background: #3a1f1c; }
+  .match-chong { background: #3a1f1c; color: #f3b3a7; }
+  .match-wen { background: #1e3323; color: #8fd39a; }
+  .match-bao { background: #1e3050; color: #8fc0f5; }
+  .star { color: #4a5568; }
+}
+
+/* ============================================================
+   打印：只保留对比表 / 结果列表，去掉交互元素
+   ============================================================ */
+@media print {
+  #sidebar, .filters, .matcher, .toolbar, #compareBar, #toast,
+  .modal-mask .close-x, .linkrow, .star, .prov-head button, .school-head button { display: none !important; }
+  #app { display: block; height: auto; }
+  #main { overflow: visible; padding: 0; }
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .modal-mask { position: static; background: none; display: block !important; }
+  .modal, .modal.wide { width: auto; max-width: none; max-height: none; overflow: visible; box-shadow: none; border-radius: 0; padding: 0; }
+  .school, .card, table { border-color: #999; break-inside: avoid; }
+  .cmp-table .clamp { -webkit-line-clamp: unset; overflow: visible; }
+  .cmp-table .more { display: none; }
+  .years .ybox b, .prov-head, .detail-sec h4 { color: #000; }
+  a { color: #000; text-decoration: none; }
 }

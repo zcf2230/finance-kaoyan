@@ -1,0 +1,14 @@
+{
+  "_说明": "人工校正表。合并调研数据后由 tools/merge-research.js 自动应用。因为调研结果里可能有错（例如把非自划线院校标成了自划线），而合并的 tags 是取并集、只会加不会减，所以错误无法通过重新合并消除——必须在这里显式声明，保证每次重新合并结果都正确。",
+  "removeTags": {
+    "zhongyangminzu": ["自划线"],
+    "huadongshida": ["自划线"],
+    "zhongguohaiyang": ["自划线"]
+  },
+  "appendNote": {
+    "zhongyangminzu": "（注：该校为 985/双一流，但不属于 34 所自主划线院校，复试线须执行国家线）",
+    "huadongshida": "（注：该校为 985/双一流，但不属于 34 所自主划线院校，复试线须执行国家线）",
+    "zhongguohaiyang": "（注：该校为 985/双一流，但不属于 34 所自主划线院校，复试线须执行国家线）"
+  },
+  "deleteSchools": ["tianjingongye"]
+}

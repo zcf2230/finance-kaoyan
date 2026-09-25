@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>金融考研择校通 · 金融学硕/专硕择校参考</title>
-<meta name="description" content="全国 31 省市 212 所院校的金融学硕（0202）与金融专硕（0251）考研数据：复试线、录取人数、学费、学制、初试科目、参考书目。数据整理自研招网与各校研究生院官网，标注参考年份与出处，仅供参考。">
+<meta name="description" content="全国 31 省市 211 所院校的金融学硕（0202）与金融专硕（0251）考研数据：复试线、录取人数、学费、学制、初试科目、参考书目。数据整理自研招网与各校研究生院官网，标注参考年份与出处，仅供参考。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231a5fb4'/><text x='32' y='46' text-anchor='middle' font-size='38' fill='%23fff' font-family='Microsoft YaHei,sans-serif'>%E9%87%91</text></svg>">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -49,11 +50,33 @@
         <select id="fSort">
           <option value="default">默认排序</option>
           <option value="line">复试线 高→低</option>
-          <option value="fee">学费 低→高</option>
+          <option value="fee">学费 低→高（按全程折算）</option>
+          <option value="enroll">录取人数 多→少</option>
+          <option value="complete">资料完整度 高→低</option>
+          <option value="diff">按分差 近→远（需填预估分）</option>
           <option value="fav">收藏优先</option>
         </select>
+        <select id="fComplete">
+          <option value="">资料不限</option>
+          <option value="line">有精确复试线</option>
+          <option value="fee">有学费</option>
+          <option value="enroll">有录取人数</option>
+          <option value="rich">资料较全（≥5 项）</option>
+        </select>
         <label class="chk"><input type="checkbox" id="fFav"> 只看收藏</label>
+        <label class="chk"><input type="checkbox" id="fFit"> 只看能上的</label>
       </div>
+
+      <div class="matcher">
+        <div class="f">
+          <label>预估总分</label>
+          <input id="fScore" type="number" min="0" max="500" step="1" placeholder="如 370">
+        </div>
+        <button id="btnClearScore">清除</button>
+        <button id="btnExportCsv">导出当前结果 CSV</button>
+        <span class="hint">填分数后每所院校标注「保底 / 稳妥 / 冲刺 / 差距大」——按预估分与复试线相差 15 分划档；未收录复试线的院校不参与匹配。</span>
+      </div>
+
       <div id="results"></div>
     </section>
 
@@ -73,12 +96,14 @@
       <h2>数据管理</h2>
       <div class="toolbar">
         <button id="btnAdd" class="primary">＋ 添加院校</button>
+        <input id="mSearch" type="search" placeholder="搜索院校 / 城市 / 省份…">
         <button id="btnExport">导出备份</button>
         <button id="btnImport" class="web-hide">导入备份</button>
         <button id="btnOpenDir" class="web-hide">打开数据文件夹</button>
         <button id="btnReset" class="danger">恢复内置数据</button>
+        <span class="count" id="mCount"></span>
       </div>
-      <p class="muted" style="margin:10px 0">数据保存在本机（应用内编辑自动保存）。每年招生简章公布后（约 9-10 月），建议核对各校最新数据并在此更新。点击院校行右侧「编辑」修改数据。</p>
+      <p class="muted" style="margin:10px 0">数据保存在本机（应用内编辑自动保存）。每年招生简章公布后（约 9-10 月），建议核对各校最新数据并在此更新。点击院校行右侧「编辑」修改数据。「完整度」列显示该校已填写的有效字段数，数字小的优先补。</p>
       <p class="muted web-only" style="margin:10px 0;padding:10px 12px;background:var(--brand-light);border-radius:8px">
         🌐 你正在使用<b>网页版</b>：这里的修改只保存在<b>你自己的浏览器</b>里（不会影响其他人看到的版本），刷新后仍在，换设备或清缓存会丢失。想长期保存请用「导出备份」。
       </p>
@@ -88,6 +113,20 @@
     <!-- ========== 说明 ========== -->
     <section id="view-about" class="view" style="display:none">
       <h2>使用说明与数据声明</h2>
+      <div class="card">
+        <b>0. 怎么用（推荐流程）</b>
+        <p class="muted">
+          ① 在「院校查询」页顶部的<b>预估总分</b>里填一个分数（比如 370），每所院校会自动标注
+          <span class="match-badge match-bao">保底</span>
+          <span class="match-badge match-wen">稳妥</span>
+          <span class="match-badge match-chong">冲刺</span>
+          <span class="match-badge match-none">差距大</span>
+          ——按预估分与该校复试线相差 15 分划档，排序自动切到「按分差」。<br>
+          ② 勾选「只看能上的」可以滤掉够不着的；再用省份 / 层次 / 数学科目筛选缩小范围。<br>
+          ③ 勾选「± 对比」最多选 4 所，点右下角「开始对比」并排看，可导出 CSV 或打印存 PDF。<br>
+          ④ 想留档就点「导出当前结果 CSV」，用 Excel 打开即可（已加 BOM，中文不乱码）。
+        </p>
+      </div>
       <div class="card">
         <b>1. 数据来源与准确性</b>
         <p class="muted">本软件数据由公开资料（研招网、各校研究生院官网、当年招生简章、公开报道）整理而成，<b>仅供参考，不构成任何择校承诺</b>。报录比、复试线、学费每年都会变化，部分院校不同学院（如人大财政金融学院与智慧治理学院、厦大经济学院与王亚南研究院）数据差异很大。报考前务必以<b>研招网（yz.chsi.com.cn）和目标院校研究生院官网当年招生简章</b>为准。每条数据都标有参考年份，点击院校可跳转官方渠道核实。</p>

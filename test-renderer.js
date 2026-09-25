@@ -112,8 +112,85 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   const rd = schools.find(s => s.id === 'renda');
   check('编辑已有院校录取人数字段', (rd.z.e || '').includes('72'));
 
-  // 11. 排序（复试线高→低）
+  // 11. 分数匹配
+  const $sel = s => window.document.querySelector(s);
   window.document.querySelectorAll('.nav-btn')[0].click();
+  $sel('#fSort').value = 'default'; $sel('#fSort').dispatchEvent(new window.Event('change'));
+  $sel('#fScore').value = '370';
+  $sel('#fScore').dispatchEvent(new window.Event('input'));
+  check('填预估分后出现冲/稳/保标注', window.document.querySelectorAll('#results .match-badge').length > 0);
+  check('排序自动切到「按分差」', $sel('#fSort').value === 'diff');
+  const firstBadge = window.document.querySelector('.school .match-badge');
+  check('按分差排序时首条是保底或稳妥', !!firstBadge && /保底|稳妥/.test(firstBadge.textContent));
+
+  const fitBox = $sel('#fFit');
+  fitBox.checked = true; fitBox.dispatchEvent(new window.Event('change'));
+  const fitCnt = window.document.querySelectorAll('.school').length;
+  check('「只看能上的」能过滤', fitCnt > 0 && fitCnt < TOTAL);
+  fitBox.checked = false; fitBox.dispatchEvent(new window.Event('change'));
+
+  $sel('#btnClearScore').click();
+  // 注意：只能数 #results 里的标注——「使用说明」页里放了 4 个示例标注，会干扰计数
+  check('清除预估分后标注消失', window.document.querySelectorAll('#results .match-badge').length === 0);
+  check('清除后排序回到默认', $sel('#fSort').value === 'default');
+
+  // 12. 资料完整度筛选
+  $sel('#fComplete').value = 'line'; $sel('#fComplete').dispatchEvent(new window.Event('change'));
+  const lineCnt = window.document.querySelectorAll('.school').length;
+  check('「有精确复试线」筛选生效', lineCnt > 0 && lineCnt < TOTAL);
+  $sel('#fComplete').value = ''; $sel('#fComplete').dispatchEvent(new window.Event('change'));
+
+  // 13. 学费排序按「全程折算」，不能拿「元/年」和「万/全程」直接比大小
+  $sel('#fSort').value = 'fee'; $sel('#fSort').dispatchEvent(new window.Event('change'));
+  const feeFirst = window.document.querySelector('.school-name').textContent;
+  const expectFirst = schools
+    .map(s => ({ n: s.name, w: window.feeTotalWan(s.z || {}) }))
+    .filter(x => isFinite(x.w)).sort((a, b) => a.w - b.w)[0].n;
+  check('学费排序与「全程折算」算法一致', feeFirst === expectFirst);
+  // 直接证明修复有效：按口径折算后的第一名，和「只比数字」的旧算法结果必须不同
+  const rawFirst = schools
+    .map(s => ({ n: s.name, w: window.parseFeeWan((s.z || {}).f) }))
+    .filter(x => isFinite(x.w)).sort((a, b) => a.w - b.w)[0].n;
+  check('学费排序已按口径折算（与只比数字的旧算法结果不同）', feeFirst !== rawFirst);
+
+  // 14. 详情弹窗的改进
+  window.openDetail('renda');
+  const d2 = window.document.querySelector('#detailModal').textContent;
+  check('来源链接不再显示「来源 1」这种无意义标签', !/来源 1/.test(d2));
+  check('详情弹窗不再重复长句提示报名人数', !/多数院校不公布/.test(d2));
+  window.closeModal('detailMask');
+
+  const nofin = schools.filter(s => s.noFinance);
+  check('存在「未查到金融硕士招生」的院校标记', nofin.length > 0);
+  if (nofin.length) {
+    window.openDetail(nofin[0].id);
+    check('未招生院校的详情页有明确警示', /未在 2026 年招生专业目录中找到/.test(window.document.querySelector('#detailModal').textContent));
+    window.closeModal('detailMask');
+  }
+
+  // 15. 管理页搜索
+  window.document.querySelectorAll('.nav-btn')[2].click();
+  const ms = $sel('#mSearch');
+  ms.value = '财经'; ms.dispatchEvent(new window.Event('input'));
+  const mRows = window.document.querySelectorAll('#manageTable tbody tr').length;
+  check('管理页搜索可用', mRows > 0 && mRows < TOTAL);
+  check('管理页显示匹配计数', /匹配/.test($sel('#mCount').textContent));
+  ms.value = ''; ms.dispatchEvent(new window.Event('input'));
+  // 前面「编辑器新增院校」已经往数据里加了一所，所以这里比对当前条数而不是初始 TOTAL
+  check('清空搜索后恢复全部', window.document.querySelectorAll('#manageTable tbody tr').length === schools.length);
+
+  // 16. 对比表：全空行不渲染 + 可导出 CSV
+  window.document.querySelectorAll('.nav-btn')[0].click();
+  window.toggleCmp('renda'); window.toggleCmp('yangcai');
+  window.openCompare();
+  const cmpTxt = window.document.querySelector('#compareModal').textContent;
+  check('对比表含「导出 CSV」按钮', cmpTxt.includes('导出 CSV'));
+  check('对比表含「打印 / 存 PDF」按钮', cmpTxt.includes('打印'));
+  const cmpRows = window.document.querySelectorAll('#compareModal .cmp-table tbody tr').length;
+  check('对比表隐藏了全空行（行数少于字段总数 12）', cmpRows < 12 && cmpRows > 3);
+  window.closeModal('compareMask');
+
+  // 17. 排序（复试线高→低）
   window.document.querySelector('#fSort').value = 'line';
   window.document.querySelector('#fSort').dispatchEvent(new window.Event('change'));
   const firstName = window.document.querySelector('.school-name').textContent;

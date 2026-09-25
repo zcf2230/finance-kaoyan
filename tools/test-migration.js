@@ -15,6 +15,10 @@ const Module = require('module');
 
 const ROOT = path.join(__dirname, '..');
 const LEGACY_HASH = 'ea5d8b2c8b26bbea77939ce8a939a61b';
+// 从 main.js 读当前数据版本，避免每次升版本都要改测试
+const CUR_VERSION = Number(
+  fs.readFileSync(path.join(ROOT, 'main.js'), 'utf-8').match(/const DATA_VERSION\s*=\s*(\d+)/)[1]
+);
 
 const results = [];
 const check = (name, cond) => results.push([cond ? 'PASS' : 'FAIL', name]);
@@ -89,7 +93,7 @@ if (baselineOk) {
 const dirA = path.join(tmpRoot, 'a');
 const A = runLoad(dirA, legacySeed(v1Schools || bundled));
 const filesA = fs.readdirSync(dirA);
-check('A. 老数据被迁移（dataVersion → 2）', A.data.dataVersion === 2);
+check(`A. 老数据被迁移（dataVersion → ${CUR_VERSION}）`, A.data.dataVersion === CUR_VERSION);
 check('A. 院校数变为最新内置数量', A.data.schools.length === bundled.length);
 check('A. 生成了 data.backup-*.json 备份', filesA.some(f => /^data\.backup-\d+\.json$/.test(f)));
 check('A. 写入 seedHash 指纹', typeof A.data.seedHash === 'string' && A.data.seedHash.length === 32);
