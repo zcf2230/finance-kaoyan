@@ -7,7 +7,8 @@
     "start": "electron .",
     "test": "node test-renderer.js && node tools/test-migration.js && node tools/test-web-mode.js",
     "build:web": "node tools/build-web.js",
-    "dist": "electron-builder --win nsis"
+    "dist": "electron-builder --win nsis",
+    "verify:build": "node tools/verify-build.js"
   },
   "build": {
     "appId": "com.kaoyan.finance",

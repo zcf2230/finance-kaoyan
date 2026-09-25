@@ -22,6 +22,7 @@ npm install        # 安装依赖
 npm start          # 启动应用（开发模式）
 npm test           # 运行全部测试（渲染 72 项 + 数据迁移 15 项 + 网页版 15 项）
 npm run dist       # 打包 Windows 安装包（输出到 dist/）
+npm run verify:build  # 打包后核验三份产物与源码一致（防中途失败的"漂移"）
 ```
 
 ## 网页版（同一套代码，无需改动即可上线）
