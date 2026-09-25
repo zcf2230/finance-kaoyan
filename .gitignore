@@ -14,3 +14,6 @@ desktop.ini
 .research/
 build.log
 dist-web/
+
+# 部署临时密钥（用完即删）
+.session-secret.tmp

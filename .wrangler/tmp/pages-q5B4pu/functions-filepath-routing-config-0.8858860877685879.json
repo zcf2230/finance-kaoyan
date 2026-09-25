@@ -1,0 +1,45 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/login",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/login.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/logout",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/logout.js:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/logout",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/logout.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/login",
+      "mountPath": "/api",
+      "method": "",
+      "module": [
+        "api/login.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/",
+      "mountPath": "/",
+      "method": "",
+      "middleware": [
+        "_middleware.js:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}

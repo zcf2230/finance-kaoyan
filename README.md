@@ -2,7 +2,7 @@
 
 金融专业考研择校参考工具：收录全国 **31 个省市 211 所**一本及以上院校的金融学硕（0202）与金融专硕（0251）招生信息，包括复试线、录取人数、报名人数/报录比、学费、学制、初试科目、参考书目、就业口碑等，支持筛选、搜索、收藏、对比，并内置**可视化数据编辑器**，方便每年自行更新数据。
 
-当前版本：**v1.3.4**（数据参考年份 2026）。
+当前版本：**v1.4.0**（数据参考年份 2026）。
 
 ## 主要功能
 
@@ -14,13 +14,15 @@
 | 数据管理 | 212 行表格带搜索与「完整度」列；可增删改院校、导出/导入备份 |
 | 导出 | 当前筛选结果导出 CSV（带 BOM，Excel 中文不乱码）；对比表导出 CSV / 打印存 PDF |
 | 外观 | 深色模式（跟随系统）、打印样式、三档缓存策略 |
+| **移动端** | 窄屏（≤900px）侧栏变顶部横向导航、卡片 4 列→2 列→1 列、弹窗全屏、宽表格横向滚动；375px 实测零横向溢出 |
+| **登录鉴权** | 网页版由 Cloudflare Pages Functions 做**服务端**校验（账号密码存在服务端密钥里，前端拿不到），30 天会话，可退出登录 |
 
 ## 开发与运行
 
 ```bash
 npm install        # 安装依赖
 npm start          # 启动应用（开发模式）
-npm test           # 运行全部测试（渲染 72 项 + 数据迁移 15 项 + 网页版 15 项）
+npm test           # 运行全部测试（渲染 72 + 迁移 15 + 网页版 15 + 鉴权 23 = 125 项）
 npm run dist       # 打包 Windows 安装包（输出到 dist/）
 npm run verify:build  # 打包后核验三份产物与源码一致（防中途失败的"漂移"）
 ```
@@ -28,13 +30,29 @@ npm run verify:build  # 打包后核验三份产物与源码一致（防中途�
 ## 网页版（同一套代码，无需改动即可上线）
 
 渲染层是纯 HTML/CSS/JS，**对 Electron 的依赖只有一处**（`app.js` 的 `getApi()`），没有 Electron 桥时自动切到浏览器模式。
+**桌面端与移动端都适配**（≤900px 侧栏变顶部导航、卡片降列、弹窗全屏）。
 
 ```bash
-npm run build:web   # 输出 dist-web/ —— 自包含单文件 index.html（首屏 1 个请求，约 40 KB brotli）
+npm run build:web   # 输出 dist-web/
 ```
 
-`dist-web/index.html` 把 CSS、JS、数据全部内联，**双击即可用，不需要任何服务器**（已在 `file://` 协议下实测）。
-部署细节见 [`DEPLOY.md`](./DEPLOY.md)。
+产物结构：
+
+```
+index.html          自包含单文件应用（CSS/JS/数据全内联，首屏 1 个请求）
+login.html          登录页（自带样式，响应式）
+functions/          服务端鉴权（_middleware + api/login + api/logout）
+_headers / robots.txt / .nojekyll
+```
+
+`dist-web/index.html` **双击即可用，不需要任何服务器**（已在 `file://` 协议下实测）；
+登录鉴权只在部署到 Cloudflare Pages 后生效。
+
+> ⚠️ 部署时注意：`wrangler pages deploy dist-web` 不会读取 `dist-web/functions/`，
+> 必须用 `npx wrangler pages deploy . --cwd dist-web ...`，看到 `Compiled Worker successfully` 才算带上鉴权。
+> 详见 [`DEPLOY.md`](./DEPLOY.md)。
+
+**详细的托管、鉴权与备案说明见 [`DEPLOY.md`](./DEPLOY.md)。**
 
 更推荐用打包脚本生成只含必要文件的产物：
 

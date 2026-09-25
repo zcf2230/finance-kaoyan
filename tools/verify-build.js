@@ -24,7 +24,9 @@ const CHECKS = [
   ['分数匹配', 'function matchOf'],
   ['导出 CSV', 'function toCsv'],
   ['深色模式', 'prefers-color-scheme: dark'],
-  ['打印样式', '@media print']
+  ['打印样式', '@media print'],
+  ['移动端适配（900px 断点）', 'max-width: 900px'],
+  ['登录退出入口', '退出登录']
 ];
 
 const TARGETS = [

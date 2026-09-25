@@ -19,19 +19,20 @@ const OUT = path.join(ROOT, 'dist-web');
 
 // 让 GitHub Pages 跳过 Jekyll 处理；_headers 给 Netlify / Cloudflare Pages 用
 const EXTRAS = {
-  '_headers': `# 整站就一个文件，数据更新后要尽快生效，缓存设短
-/index.html
-  Cache-Control: public, max-age=300, must-revalidate
-
-/
-  Cache-Control: public, max-age=300, must-revalidate
-
-/*
+  // 站点已加登录鉴权，属于私有内容：禁止收录、禁止共享缓存（避免 CDN 把页面发给未登录的人）
+  '_headers': `/*
+  X-Robots-Tag: noindex, nofollow
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+
+/index.html
+  Cache-Control: private, max-age=300, must-revalidate
+
+/login.html
+  Cache-Control: no-store
 `,
   'robots.txt': `User-agent: *
-Allow: /
+Disallow: /
 `,
   '.nojekyll': ''
 };
@@ -67,6 +68,16 @@ function buildSingleFile(data) {
   return html;
 }
 
+function copyDir(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, e.name);
+    const d = path.join(dest, e.name);
+    if (e.isDirectory()) copyDir(s, d);
+    else fs.copyFileSync(s, d);
+  }
+}
+
 function main() {
   fs.rmSync(OUT, { recursive: true, force: true });
   fs.mkdirSync(OUT, { recursive: true });
@@ -78,10 +89,20 @@ function main() {
     fs.writeFileSync(path.join(OUT, name), content, 'utf-8');
   }
 
+  // 登录页（自带样式，响应式）
+  fs.copyFileSync(path.join(ROOT, 'renderer', 'login.html'), path.join(OUT, 'login.html'));
+
+  // Cloudflare Pages Functions（服务端鉴权）。本地双击打开时用不到，部署后生效。
+  const fnSrc = path.join(ROOT, 'cloudflare', 'functions');
+  if (fs.existsSync(fnSrc)) copyDir(fnSrc, path.join(OUT, 'functions'));
+  else console.warn('⚠️ 未找到 cloudflare/functions，部署后将没有登录鉴权');
+
   const raw = Buffer.byteLength(html, 'utf-8');
   const br = zlib.brotliCompressSync(Buffer.from(html, 'utf-8')).length;
   console.log(`已生成 ${path.relative(ROOT, OUT)}/`);
   console.log(`  index.html   ${(raw / 1024).toFixed(1)} KB（brotli 压缩后 ${(br / 1024).toFixed(1)} KB）`);
+  console.log(`  login.html   登录页`);
+  console.log(`  functions/   服务端鉴权（_middleware + api/login + api/logout）`);
   console.log(`  _headers / robots.txt / .nojekyll`);
   console.log(`  首屏请求数：1（原多文件版为 9）`);
 

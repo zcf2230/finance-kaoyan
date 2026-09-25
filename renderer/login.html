@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>登录 · 金融考研择校通</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%231a5fb4'/><stop offset='100%25' stop-color='%234a90d9'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><text x='32' y='46' text-anchor='middle' font-size='38' fill='%23fff' font-family='Microsoft YaHei,sans-serif'>%E9%87%91</text></svg>">
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#fff; --line:#e5e9f0; --text:#1f2d3d; --muted:#5b6b80;
+    --brand:#1a5fb4; --danger:#c0392b; --input:#fff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14181f; --card:#1c222c; --line:#2b3441; --text:#e3e9f2; --muted:#9aa9bd;
+           --brand:#6aa8f0; --danger:#f08a7c; --input:#232b36; }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif;
+    background:var(--bg); color:var(--text);
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:20px; padding-bottom:calc(20px + env(safe-area-inset-bottom));
+  }
+  .box{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    width:100%; max-width:380px; padding:28px 24px;
+    box-shadow:0 8px 30px rgba(0,0,0,.08);
+  }
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .icon{
+    width:46px;height:46px;border-radius:12px;flex:none;
+    background:linear-gradient(135deg,#1a5fb4,#4a90d9);color:#fff;
+    font-size:25px;font-weight:bold;display:flex;align-items:center;justify-content:center;
+  }
+  h1{font-size:17px;line-height:1.3}
+  .sub{font-size:12px;color:var(--muted);margin-top:3px}
+  label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px}
+  input{
+    width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+    font-size:16px;  /* 16px 以下 iOS Safari 会自动放大页面，必须 ≥16px */
+    background:var(--input);color:var(--text);outline:none;
+    -webkit-appearance:none;appearance:none;
+  }
+  input:focus{border-color:var(--brand)}
+  button{
+    width:100%;margin-top:22px;padding:13px;border:none;border-radius:10px;
+    background:var(--brand);color:#fff;font-size:15px;font-weight:bold;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  button:disabled{opacity:.6;cursor:default}
+  .err{
+    display:none;margin-top:14px;padding:10px 12px;border-radius:8px;font-size:13px;
+    background:#fdecea;color:#8c2f22;border:1px solid #f5c6c0;
+  }
+  @media (prefers-color-scheme: dark){ .err{background:#3a1f1c;color:#f3b3a7;border-color:#5c2f28} }
+  .foot{margin-top:18px;font-size:12px;color:var(--muted);line-height:1.7;text-align:center}
+  @media (max-width:400px){ .box{padding:22px 18px} h1{font-size:16px} }
+</style>
+</head>
+<body>
+<form class="box" id="f" autocomplete="on">
+  <div class="brand">
+    <div class="icon">金</div>
+    <div>
+      <h1>金融考研择校通</h1>
+      <div class="sub">请登录后使用</div>
+    </div>
+  </div>
+
+  <label for="u">账户名</label>
+  <input id="u" name="username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+
+  <label for="p">密码</label>
+  <input id="p" name="password" type="password" autocomplete="current-password" required>
+
+  <button type="submit" id="btn">登录</button>
+  <div class="err" id="err"></div>
+
+  <div class="foot">仅限本人使用 · 数据整理自公开渠道，仅供参考</div>
+</form>
+
+<script>
+(function () {
+  var f = document.getElementById('f');
+  var btn = document.getElementById('btn');
+  var err = document.getElementById('err');
+
+  function show(msg) { err.textContent = msg; err.style.display = 'block'; }
+
+  f.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    err.style.display = 'none';
+    var u = document.getElementById('u').value.trim();
+    var p = document.getElementById('p').value;
+    if (!u || !p) { show('请填写账户名和密码'); return; }
+
+    btn.disabled = true; btn.textContent = '登录中…';
+    try {
+      var r = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
+      });
+      if (r.ok) {
+        location.replace('/');           // 带上刚下发的 Cookie 进入应用
+        return;
+      }
+      var d = await r.json().catch(function () { return {}; });
+      show(d.error || (r.status === 401 ? '账户名或密码不正确' : '登录失败，请稍后重试'));
+    } catch (_) {
+      show('网络异常，请检查连接后重试');
+    }
+    btn.disabled = false; btn.textContent = '登录';
+  });
+})();
+</script>
+</body>
+</html>

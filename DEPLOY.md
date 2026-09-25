@@ -1,38 +1,69 @@
 # 网页版部署说明
 
-## 〇、当前状态：已下线（2026-09-24）
+## 〇、当前状态：已重新上线 + 登录鉴权 + 移动端适配（2026-09-25）
 
-**网站已于 2026-09-24 从 Cloudflare Pages 删除，公网已无法访问**
-（`jinrong-kaoyan.pages.dev` DNS 解析返回 `Non-existent domain`，部署子域名同样失效）。
+- **线上地址**：https://jinrong-kaoyan.pages.dev
+- **登录**：账号 `ZCF`（密码见 Cloudflare 密钥，不在代码与文档里）
+- **平台**：Cloudflare Pages + Pages Functions（免费额度足够）
+- **账号**：zcf2230@gmail.com（Account ID `195f61883161e7da9de43293f7643f93`）
+- **已实测**：未登录 → 302 跳登录页；密码错 → 401；密码对 → 下发 HttpOnly Cookie 并可访问应用；
+  手机 375px 与电脑 1200px 均正常渲染、零横向溢出。
 
-原因：凡宝要求下线，改为只有自己使用。
+### 鉴权是怎么做的（不是前端假校验）
 
-### 现在怎么用
+纯前端 JS 校验密码 = 假安全，按 F12 就能在源码里看到密码。这里用 **Cloudflare Pages Functions**
+做服务端校验：
 
-**方式一（推荐）：桌面应用**
-桌面快捷方式「金融考研择校通」→ v1.3.0，内置同样的 211 所院校数据，功能更全
-（多了「导入备份」「打开数据文件夹」）。
+```
+cloudflare/functions/_middleware.js   所有请求先过这里；无有效 Cookie 就跳登录页
+cloudflare/functions/api/login.js     POST 比对服务端密钥，通过后下发签名 Cookie
+cloudflare/functions/api/logout.js    清 Cookie 回登录页
+```
 
-**方式二：双击单文件网页**
-`dist-web/index.html` —— 这是自包含单文件（CSS/JS/数据全内联），
-**双击用浏览器打开即可，不需要任何服务器**（已在 `file://` 协议下实测：211 所院校正常渲染）。
-可以随便复制到别的位置或发给别人。
+- 账号密码存在 **Cloudflare 项目环境变量**（`USER` / `PASS` / `SESSION_SECRET`），浏览器拿不到；
+- 会话令牌 = `HMAC-SHA256(SESSION_SECRET, 固定串)`，不知道密钥无法伪造；
+- Cookie 带 `HttpOnly; Secure; SameSite=Lax`，有效期 30 天；
+- **改 `SESSION_SECRET` 可让所有已登录设备立即失效**；
+- 密码错误与账号错误返回同样的提示，不泄露哪个错了。
 
-### 如果要重新上线
+### ⚠️ 部署时的一个坑
+
+`wrangler pages deploy dist-web` **不会**读取 `dist-web/functions/`——它只从**当前工作目录**找 `functions/`。
+第一次部署时输出里没有 `Compiled Worker successfully`，线上首页仍是 200（没鉴权）。
+正确写法（`--cwd` 指到产物目录，让 `functions/` 被探测到）：
 
 ```bash
 npm run build:web
-npx wrangler pages project create jinrong-kaoyan --production-branch=main
-npx wrangler pages deploy dist-web --project-name=jinrong-kaoyan --branch=main --commit-dirty=true
+npx wrangler pages deploy . --cwd dist-web --project-name=jinrong-kaoyan --branch=main --commit-dirty=true
 ```
 
-两条命令，约 30 秒。
+看到 **`Compiled Worker successfully` + `Uploading Functions bundle`** 才算把鉴权部署上去了。
 
-### 如果要「在线但只有自己能看」
+### 更新线上内容
 
-用 **Cloudflare Access**（Zero Trust，免费额度 50 个用户）给 Pages 项目加访问策略，
-只有指定邮箱能进，访问时会要求邮箱验证码。适合需要在手机/多设备上看的场景。
-入口：Cloudflare 后台 → Zero Trust → Access → Applications → Add an application → Self-hosted。
+```bash
+npm run build:web
+npx wrangler pages deploy . --cwd dist-web --project-name=jinrong-kaoyan --branch=main --commit-dirty=true
+npm run verify:build      # 核验产物与源码一致
+```
+
+### 改账号密码
+
+Cloudflare 后台 → Workers & Pages → jinrong-kaoyan → Settings → Variables and Secrets，
+改 `USER` / `PASS`；改完建议同时改 `SESSION_SECRET`（让旧会话失效）。改完重新部署一次生效。
+
+也可以用 API 直接改（需要 API 令牌）：
+
+```bash
+curl -X PATCH "https://api.cloudflare.com/client/v4/accounts/<AccountID>/pages/projects/jinrong-kaoyan" \
+  -H "Authorization: Bearer <TOKEN>" -H "Content-Type: application/json" \
+  -d '{"deployment_configs":{"production":{"env_vars":{"USER":{"value":"新账号"},"PASS":{"value":"新密码"}}}}}'
+```
+
+### 其他用法（不受影响）
+
+- **桌面应用**：桌面快捷方式「金融考研择校通」，功能最全（多了「导入备份」「打开数据文件夹」）
+- **离线单文件**：`dist-web/index.html` 双击即可用，不需要服务器（登录只对线上生效）
 
 ---
 

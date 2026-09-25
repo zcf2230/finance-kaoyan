@@ -1,11 +1,11 @@
 {
   "name": "finance-kaoyan-app",
-  "version": "1.3.4",
+  "version": "1.4.0",
   "description": "金融考研择校通",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "node test-renderer.js && node tools/test-migration.js && node tools/test-web-mode.js",
+    "test": "node test-renderer.js && node tools/test-migration.js && node tools/test-web-mode.js && node tools/test-auth.js",
     "build:web": "node tools/build-web.js",
     "dist": "electron-builder --win nsis",
     "verify:build": "node tools/verify-build.js"
