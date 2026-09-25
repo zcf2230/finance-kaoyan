@@ -17,3 +17,6 @@ dist-web/
 
 # 部署临时密钥（用完即删）
 .session-secret.tmp
+
+# wrangler 本地缓存（部署调试产物，不入库）
+.wrangler/
