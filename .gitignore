@@ -20,3 +20,7 @@ dist-web/
 
 # wrangler 本地缓存（部署调试产物，不入库）
 .wrangler/
+
+# 部署日志
+deploy*.log
+build*.log

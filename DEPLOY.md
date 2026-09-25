@@ -39,6 +39,53 @@ npx wrangler pages deploy . --cwd dist-web --project-name=jinrong-kaoyan --branc
 
 看到 **`Compiled Worker successfully` + `Uploading Functions bundle`** 才算把鉴权部署上去了。
 
+### ⚠️⚠️ 另一个更隐蔽的坑：clean URLs 导致无限重定向
+
+**症状**：浏览器打开站点报 `ERR_TOO_MANY_REDIRECTS`，停在 `/login.html` 上。
+
+**原因**：Cloudflare Pages 有 **clean URLs** 特性，会把 `/login.html` **308 重定向到 `/login`**。
+如果中间件的放行名单里只写了 `/login.html`，就会死循环：
+
+```
+/            → 中间件无 Cookie → 302 → /login.html
+/login.html  → Pages clean URLs → 308 → /login
+/login       → 中间件：/login 不在放行名单 → 302 → /login.html   ← 回到第二步，死循环
+```
+
+**修法**：放行名单**同时包含 `/login` 和 `/login.html`**，并且跳转目标用 canonical 的 `/login`（少一次 308）。
+
+**⚠️ 这个坑 curl 测不出来**——curl 默认不跟随跳转，只会看到那个 302，以为一切正常。
+必须用 `curl -L` 或真实浏览器才能暴露：
+
+```bash
+curl -s -L --max-redirs 8 -o /dev/null -w "最终 %{http_code}  跳转 %{num_redirects} 次  落点 %{url_effective}\n" \
+  https://jinrong-kaoyan.pages.dev/
+# 正常应输出：最终 200  跳转 1 次  落点 .../login
+```
+
+`tools/test-auth.js` 里也补了对应断言（`/login` 与 `/login.html` 都放行 + 模拟完整跳转链路不循环）。
+
+### ⚠️⚠️⚠️ 第三个坑：`npx wrangler@latest` 会卡住不输出
+
+**症状**：`npx --yes wrangler@latest pages deploy ...` 挂住，日志 0 字节，连 `WRANGLER_LOG=debug` 都没有任何输出，最后超时被杀。看起来像 wrangler 卡了，其实是 **npx 在「检查有没有新版本」这一步就卡住了**（走代理时容易发生）。
+
+**判断方法**：日志文件**完全为空**（连 wrangler 的横幅都没有）→ 问题在 npx，不在 wrangler。
+
+**修法**：绕开 npx，直接用本地缓存里的 wrangler：
+
+```bash
+# 先找到缓存路径（npx 之前跑成功过就会留下）
+ls -d "$LOCALAPPDATA/npm-cache/_npx/"*/node_modules/wrangler/bin/wrangler.js
+
+# 直接用 node 跑它
+node "$LOCALAPPDATA/npm-cache/_npx/<hash>/node_modules/wrangler/bin/wrangler.js" \
+  pages deploy . --cwd dist-web --project-name=jinrong-kaoyan --branch=main --commit-dirty=true
+```
+
+（用托管 Node 时把 `node` 换成完整路径。）这样输出正常，秒级完成。
+
+
+
 ### 更新线上内容
 
 ```bash
