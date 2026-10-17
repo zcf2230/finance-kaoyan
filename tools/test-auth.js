@@ -11,7 +11,7 @@
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
 
-const ENV = { USER: 'ZCF', PASS: 'fanfan666', SESSION_SECRET: 'test-secret-do-not-use-in-prod' };
+const ENV = { USER: 'ZCF', PASS: 'test-only-pass', SESSION_SECRET: 'test-secret-do-not-use-in-prod' };
 const ORIGIN = 'https://example.com';
 
 const results = [];
@@ -70,14 +70,14 @@ const req = (pathname, opts = {}) => new Request(ORIGIN + pathname, opts);
   check('密码错误 → 401', r.status === 401);
   check('密码错误不返回 Cookie', !r.headers.get('Set-Cookie'));
 
-  r = await login.onRequestPost(ctx(post({ username: 'wrong', password: 'fanfan666' })));
+  r = await login.onRequestPost(ctx(post({ username: 'wrong', password: 'test-only-pass' })));
   check('账户名错误 → 401', r.status === 401);
 
   r = await login.onRequestPost(ctx(post({})));
   check('空账号密码 → 401', r.status === 401);
 
   // ---- 5. 密码正确 → 下发 HttpOnly Secure Cookie ----
-  r = await login.onRequestPost(ctx(post({ username: 'ZCF', password: 'fanfan666' })));
+  r = await login.onRequestPost(ctx(post({ username: 'ZCF', password: 'test-only-pass' })));
   const setCookie = r.headers.get('Set-Cookie') || '';
   check('密码正确 → 200', r.status === 200);
   check('下发 kb_session Cookie', /kb_session=/.test(setCookie));
@@ -100,10 +100,10 @@ const req = (pathname, opts = {}) => new Request(ORIGIN + pathname, opts);
   check('换 SESSION_SECRET 后旧 Cookie 失效', r.status === 302);
 
   // ---- 9. 未配置密钥时明确报错（而不是放行）----
-  r = await mw.onRequest(ctx(req('/'), { USER: 'ZCF', PASS: 'fanfan666' }));
+  r = await mw.onRequest(ctx(req('/'), { USER: 'ZCF', PASS: 'test-only-pass' }));
   check('缺 SESSION_SECRET → 500 且不放行', r.status === 500);
 
-  r = await login.onRequestPost(ctx(post({ username: 'ZCF', password: 'fanfan666' }), { USER: 'ZCF' }));
+  r = await login.onRequestPost(ctx(post({ username: 'ZCF', password: 'test-only-pass' }), { USER: 'ZCF' }));
   check('缺 PASS → 500', r.status === 500);
 
   // ---- 10. 退出登录 ----
@@ -121,7 +121,7 @@ const req = (pathname, opts = {}) => new Request(ORIGIN + pathname, opts);
     e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
   const leaked = walk(path.join(ROOT, 'dist-web'))
     .filter(f => /\.(js|html)$/.test(f))
-    .filter(f => fs.readFileSync(f, 'utf-8').includes('fanfan666'));
+    .filter(f => fs.readFileSync(f, 'utf-8').includes('test-only-pass'));
   check('打包产物里没有明文密码', leaked.length === 0);
 
   const fails = results.filter(x => x[0] === 'FAIL');
