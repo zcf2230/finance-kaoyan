@@ -20,15 +20,16 @@ function applyTheme() {
   const dark = pref === 'dark' ||
     (pref === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  const btn = document.querySelector('#btnTheme');
-  if (btn) btn.textContent = '主题：' + (pref === 'auto' ? '跟随系统' : pref === 'dark' ? '深色' : '浅色');
+  if (typeof renderThemeSeg === 'function') renderThemeSeg();
 }
-function cycleTheme() {
-  const order = ['auto', 'light', 'dark'];
-  const next = order[(order.indexOf(themePref()) + 1) % 3];
-  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+function setTheme(pref) {
+  try { localStorage.setItem(THEME_KEY, pref); } catch (e) {}
   applyTheme();
-  toast('主题：' + (next === 'auto' ? '跟随系统' : next === 'dark' ? '深色' : '浅色'));
+}
+function renderThemeSeg() {
+  const pref = themePref();
+  document.querySelectorAll('#themeSeg [data-t]').forEach(b =>
+    b.classList.toggle('on', b.dataset.t === pref));
 }
 applyTheme();
 if (window.matchMedia) {
@@ -262,7 +263,7 @@ function progRow(sch, key) {
   </div>`;
 }
 function tagHtml(tags) {
-  return (tags || []).map(t => `<span class="tag ${t === '财经类' ? 'caijing' : ''}">${esc(t)}</span>`).join('');
+  return (tags || []).map(t => `<span class="tag" data-t="${esc(t)}">${esc(t)}</span>`).join('');
 }
 
 function filteredSchools() {
@@ -332,7 +333,9 @@ function filteredSchools() {
 /* 一张院校卡（查询页与收藏页共用同一份标记，避免两处样式走偏） */
 function schoolCardHtml(s, pk, progs) {
   const m = SCORE != null ? matchOf(parseLineVal(s[pk] || {}), SCORE) : null;
-  return `<div class="school ${s.noFinance ? 'nofin' : ''}" data-id="${s.id}">
+  const tags = s.tags || [];
+  const tier = tags.includes('985') ? 'tier-985' : tags.includes('211') ? 'tier-211' : tags.includes('财经类') ? 'tier-caijing' : '';
+  return `<div class="school ${tier} ${s.noFinance ? 'nofin' : ''}" data-id="${s.id}">
     <div class="school-head" onclick="openDetail('${s.id}')">
       <span class="school-name">${esc(s.name)}</span>${tagHtml(s.tags)}
       ${s.noFinance ? '<span class="badge-nofin">未查到金融硕士招生</span>' : ''}
@@ -882,7 +885,11 @@ async function init() {
     if (VIEW === 'fav') renderFav();
     if (VIEW === 'timeline') renderTimeline();
   });
-  const btnTheme = $('#btnTheme'); if (btnTheme) btnTheme.onclick = cycleTheme;
+  document.querySelectorAll('#themeSeg [data-t]').forEach(b => b.onclick = () => setTheme(b.dataset.t));
+  const tintSelects = () => document.querySelectorAll('.filters select').forEach(sel =>
+    sel.classList.toggle('nondefault', !!sel.value));
+  document.querySelectorAll('.filters select').forEach(sel => sel.addEventListener('change', tintSelects));
+  tintSelects();
   const btnReport = $('#btnReport'); if (btnReport) btnReport.onclick = buildReport;
   const btnFavCsv = $('#btnFavCsv'); if (btnFavCsv) btnFavCsv.onclick = exportFavCsv;
 

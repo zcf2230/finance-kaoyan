@@ -289,15 +289,15 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   check('时间线标记当前阶段', !!window.document.querySelector('#timelineBox .tl-item.now'));
   check('数据更新状态表含年份统计', /2026/.test(window.document.querySelector('#yearStat').textContent));
 
-  // 20. 手动主题切换
-  const themeBtn = window.document.querySelector('#btnTheme');
+  // 20. 手动主题三段选择器
+  const segBtn = t => window.document.querySelector(`#themeSeg [data-t="${t}"]`);
   const themeOf = () => window.document.documentElement.getAttribute('data-theme');
-  themeBtn.click();
-  check('主题切换：跟随系统 → 浅色', themeOf() === 'light');
-  themeBtn.click();
-  check('主题切换：浅色 → 深色', themeOf() === 'dark');
-  themeBtn.click();
-  check('主题切换：深色 → 跟随系统', /跟随系统/.test(themeBtn.textContent));
+  segBtn('light').click();
+  check('主题选择器：点浅色即浅色', themeOf() === 'light' && segBtn('light').classList.contains('on'));
+  segBtn('dark').click();
+  check('主题选择器：点深色即深色', themeOf() === 'dark' && segBtn('dark').classList.contains('on'));
+  segBtn('auto').click();
+  check('主题选择器：点跟随系统即回到系统偏好', segBtn('auto').classList.contains('on') && ['light', 'dark'].includes(themeOf()));
 
   // 21. 择校报告
   $sel('#fScore').value = '370';

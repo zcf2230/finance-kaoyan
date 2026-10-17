@@ -1,6 +1,6 @@
 {
   "name": "finance-kaoyan-app",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "金融考研择校通",
   "main": "main.js",
   "scripts": {
