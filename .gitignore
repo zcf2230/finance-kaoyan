@@ -15,6 +15,13 @@ desktop.ini
 build.log
 dist-web/
 
+# 预览产物（由 npm run preview 生成）
+preview/*.html
+!preview/_template.html
+
+# 报告样例 PDF（1.7MB，本地留存，不入库）
+docs/screenshots/*.pdf
+
 # 部署临时密钥（用完即删）
 .session-secret.tmp
 

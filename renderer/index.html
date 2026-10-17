@@ -4,22 +4,25 @@
 <meta charset="UTF-8">
 <title>金融考研择校通 · 金融学硕/专硕择校参考</title>
 <meta name="description" content="全国 31 省市 211 所院校的金融学硕（0202）与金融专硕（0251）考研数据：复试线、录取人数、学费、学制、初试科目、参考书目。数据整理自研招网与各校研究生院官网，标注参考年份与出处，仅供参考。">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%231a5fb4'/><stop offset='100%25' stop-color='%234a90d9'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><text x='32' y='46' text-anchor='middle' font-size='38' fill='%23fff' font-family='Microsoft YaHei,sans-serif'>%E9%87%91</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%230f525a'/><stop offset='55%25' stop-color='%23176b75'/><stop offset='100%25' stop-color='%232fa0ac'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><text x='32' y='46' text-anchor='middle' font-size='38' fill='%23fff' font-family='Microsoft YaHei,sans-serif'>%E7%A0%94</text></svg>">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div id="app">
   <aside id="sidebar">
     <div class="logo">
-      <div class="logo-icon">金</div>
-      <div><div class="logo-title">金融考研择校通</div><div class="logo-sub">学硕 · 专硕 · 择校参考</div></div>
+      <div class="logo-icon">研</div>
+      <div><div class="logo-title">金融考研择校通</div><div class="logo-sub">2027 择校数据台</div></div>
     </div>
     <nav>
-      <button class="nav-btn active" data-view="query">🔍 院校查询</button>
-      <button class="nav-btn" data-view="national">📈 国家线参考</button>
-      <button class="nav-btn" data-view="manage">🗂️ 数据管理</button>
-      <button class="nav-btn" data-view="about">ℹ️ 使用说明</button>
+      <button class="nav-btn active" data-view="query"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>院校查询</span></button>
+      <button class="nav-btn" data-view="fav"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.9 6.3.7-4.7 4.4 1.3 6.3L12 17l-5.6 3.3 1.3-6.3L3 9.6l6.3-.7z"/></svg><span>我的收藏</span></button>
+      <button class="nav-btn" data-view="national"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-5 3 3 5-7"/></svg><span>国家线参考</span></button>
+      <button class="nav-btn" data-view="timeline"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>备考时间线</span></button>
+      <button class="nav-btn" data-view="manage"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h13"/></svg><span>数据管理</span></button>
+      <button class="nav-btn" data-view="about"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg><span>使用说明</span></button>
     </nav>
+    <div style="padding:10px 8px 0"><button id="btnTheme" style="width:100%">主题：跟随系统</button></div>
     <div class="sidebar-foot" id="statLine"></div>
   </aside>
 
@@ -74,6 +77,7 @@
         </div>
         <button id="btnClearScore">清除</button>
         <button id="btnExportCsv">导出当前结果 CSV</button>
+        <button id="btnReport" title="按当前筛选与预估分生成一份可打印存 PDF 的择校报告">生成择校报告 PDF</button>
         <span class="hint">填分数后每所院校标注「保底 / 稳妥 / 冲刺 / 差距大」——按预估分与复试线相差 15 分划档；未收录复试线的院校不参与匹配。</span>
       </div>
 
@@ -89,6 +93,24 @@
         <b>A 区 / B 区说明</b>
         <p class="muted">A 区：北京、天津、河北、山西、辽宁、吉林、黑龙江、上海、江苏、浙江、安徽、福建、江西、山东、河南、湖北、湖南、广东、重庆、四川、陕西 21 个省市；B 区：内蒙古、广西、海南、贵州、云南、西藏、甘肃、青海、宁夏、新疆 10 个省区，B 区总分线一般比 A 区低 10 分左右，单科低 3~5 分。</p>
       </div>
+    </section>
+
+    <!-- ========== 我的收藏 ========== -->
+    <section id="view-fav" class="view" style="display:none">
+      <h2>我的收藏</h2>
+      <div class="toolbar">
+        <button id="btnFavCsv" class="mini">导出收藏 CSV</button>
+        <span class="count" id="favCount"></span>
+      </div>
+      <p class="muted" style="margin:10px 0">收藏保存在本机（网页版保存在你自己的浏览器里）。在「院校查询」点院校右侧的 ★ 添加或取消；列表按最新复试线从高到低排。</p>
+      <div id="favResults"></div>
+    </section>
+
+    <!-- ========== 备考时间线 ========== -->
+    <section id="view-timeline" class="view" style="display:none">
+      <h2>2027 届备考时间线</h2>
+      <div class="card"><div class="tl" id="timelineBox"></div></div>
+      <div class="card"><b>数据更新状态</b><div id="yearStat" style="margin-top:8px"></div></div>
     </section>
 
     <!-- ========== 数据管理 ========== -->
@@ -188,6 +210,7 @@
 </div>
 
 <div id="toast" style="display:none"></div>
+<div id="report"></div>
 <script src="app.js"></script>
 </body>
 </html>

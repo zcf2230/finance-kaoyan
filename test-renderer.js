@@ -118,14 +118,15 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   const cmp = window.document.querySelector('#compareModal').textContent;
   check('对比表含三校与复试线', cmp.includes('中国人民大学') && cmp.includes('上海财经大学') && cmp.includes('复试线'));
   check('对比表含就业/口碑行', cmp.includes('就业'));
+  check('对比弹窗含五维雷达图', !!window.document.querySelector('#compareModal svg polygon') && cmp.includes('上岸友好') && cmp.includes('学费友好'));
   window.closeModal('compareMask');
 
   // 8. 国家线
-  window.document.querySelectorAll('.nav-btn')[1].click();
+  window.document.querySelector('.nav-btn[data-view="national"]').click();
   check('国家线表含 2026/324', window.document.querySelector('#nationalTable').textContent.includes('324'));
 
   // 9. 编辑器：添加新院校
-  window.document.querySelectorAll('.nav-btn')[2].click();
+  window.document.querySelector('.nav-btn[data-view="manage"]').click();
   window.openEditor(null);
   const newId = 'test-' + Date.now();
   window.document.querySelector('#eName').value = '测试大学';
@@ -149,7 +150,7 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
 
   // 11. 分数匹配
   const $sel = s => window.document.querySelector(s);
-  window.document.querySelectorAll('.nav-btn')[0].click();
+  window.document.querySelector('.nav-btn[data-view="query"]').click();
   $sel('#fSort').value = 'default'; $sel('#fSort').dispatchEvent(new window.Event('change'));
   $sel('#fScore').value = '370';
   $sel('#fScore').dispatchEvent(new window.Event('input'));
@@ -204,7 +205,7 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   }
 
   // 15. 管理页搜索
-  window.document.querySelectorAll('.nav-btn')[2].click();
+  window.document.querySelector('.nav-btn[data-view="manage"]').click();
   const ms = $sel('#mSearch');
   ms.value = '财经'; ms.dispatchEvent(new window.Event('input'));
   const mRows = window.document.querySelectorAll('#manageTable tbody tr').length;
@@ -215,7 +216,7 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   check('清空搜索后恢复全部', window.document.querySelectorAll('#manageTable tbody tr').length === schools.length);
 
   // 16. 对比表：全空行不渲染 + 可导出 CSV
-  window.document.querySelectorAll('.nav-btn')[0].click();
+  window.document.querySelector('.nav-btn[data-view="query"]').click();
   window.toggleCmp('renda'); window.toggleCmp('yangcai');
   window.openCompare();
   const cmpTxt = window.document.querySelector('#compareModal').textContent;
@@ -270,6 +271,44 @@ const WITH_LINE = schools.filter(s => ['z', 'x'].some(k => s[k] && s[k].l && Obj
   for (const [p, exp, label] of plCases) {
     check(`parseLineVal：${label}`, pl(p) === exp);
   }
+
+  // 18. 收藏夹独立页
+  window.toggleFav({ stopPropagation() {} }, 'renda');
+  window.document.querySelector('.nav-btn[data-view="fav"]').click();
+  const favTxt = window.document.querySelector('#favResults').textContent;
+  check('收藏页显示已收藏院校', favTxt.includes('中国人民大学'));
+  check('收藏页显示计数', /共 1 所/.test(window.document.querySelector('#favCount').textContent));
+  window.toggleFav({ stopPropagation() {} }, 'renda');
+  window.document.querySelector('.nav-btn[data-view="fav"]').click();
+  check('取消收藏后收藏页为空态', /还没有收藏/.test(window.document.querySelector('#favResults').textContent));
+  window.toggleFav({ stopPropagation() {} }, 'renda'); // 留一条给报告测试用
+
+  // 19. 备考时间线
+  window.document.querySelector('.nav-btn[data-view="timeline"]').click();
+  check('时间线渲染 8 个节点', window.document.querySelectorAll('#timelineBox .tl-item').length === 8);
+  check('时间线标记当前阶段', !!window.document.querySelector('#timelineBox .tl-item.now'));
+  check('数据更新状态表含年份统计', /2026/.test(window.document.querySelector('#yearStat').textContent));
+
+  // 20. 手动主题切换
+  const themeBtn = window.document.querySelector('#btnTheme');
+  const themeOf = () => window.document.documentElement.getAttribute('data-theme');
+  themeBtn.click();
+  check('主题切换：跟随系统 → 浅色', themeOf() === 'light');
+  themeBtn.click();
+  check('主题切换：浅色 → 深色', themeOf() === 'dark');
+  themeBtn.click();
+  check('主题切换：深色 → 跟随系统', /跟随系统/.test(themeBtn.textContent));
+
+  // 21. 择校报告
+  $sel('#fScore').value = '370';
+  $sel('#fScore').dispatchEvent(new window.Event('input'));
+  window.document.querySelector('.nav-btn[data-view="query"]').click();
+  window.document.querySelector('#btnReport').click();
+  const rep = window.document.querySelector('#report').textContent;
+  check('报告含标题与筛选条件', rep.includes('金融考研择校报告') && rep.includes('预估总分 370'));
+  check('报告按保底/稳妥/冲刺分组', rep.includes('保底') && rep.includes('冲刺'));
+  check('报告含已收藏院校', rep.includes('已收藏院校'));
+  check('报告含数据免责声明', rep.includes('不构成报考建议'));
 
   const fails = results.filter(r => r[0] === 'FAIL');
   for (const [s, n] of results) console.log(s, '-', n);

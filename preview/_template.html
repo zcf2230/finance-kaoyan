@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>金融考研择校通 v2 · 界面预览</title>
+<style>
+/* ============================================================
+   v2 设计系统
+   颜色/间距/字号全部走变量：切换 data-theme 即可换肤
+   ============================================================ */
+:root{
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px;
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px;
+  --fz-xs:11px; --fz-sm:12px; --fz-md:13px; --fz-base:14px; --fz-lg:16px; --fz-xl:20px; --fz-2xl:26px;
+  --rail-w:224px;
+  --ease:cubic-bezier(.32,.72,0,1);
+}
+/* 深色：同色系压暗，强调色提亮（青绿为主，砖红为辅） */
+:root, :root[data-theme="dark"]{
+  --bg:#14181a;
+  --surface:#1a1f21;
+  --surface-2:#1f2527;
+  --surface-3:#242b2d;
+  --line:#2c3437;
+  --line-2:#242b2d;
+  --line-strong:#3a4548;
+  --text:#e8edec;
+  --text-2:#c2cbca;
+  --muted:#93a09e;
+  --brand:#4aa8b2;
+  --brand-deep:#5bbcc6;
+  --brand-soft:rgba(74,168,178,.14);
+  --gold:#d6a95e;
+  --gold-soft:rgba(214,169,94,.13);
+  --ok:#5db98b; --ok-soft:rgba(93,185,139,.13);
+  --warn:#d6a95e; --warn-soft:rgba(214,169,94,.13);
+  --bad:#e07a5f; --bad-soft:rgba(224,122,95,.13);
+  --zone-bad:rgba(224,122,95,.46); --zone-chong:rgba(214,169,94,.44);
+  --zone-wen:rgba(93,185,139,.42); --zone-bao:rgba(74,168,178,.46);
+  --mask:rgba(6,9,10,.72);
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 18px 40px -26px rgba(0,0,0,.9);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  --grid-line:#242b2d;
+}
+/* 浅色：暖白纸感 + 极淡描边，分层靠边框与留白，不靠投影 */
+:root[data-theme="light"]{
+  --bg:#faf9f6;
+  --surface:#ffffff;
+  --surface-2:#fdfdfb;
+  --surface-3:#f3f3ef;
+  --line:#dfe4e1;
+  --line-2:#e9ede9;
+  --line-strong:#ccd4d0;
+  --text:#202a30;
+  --text-2:#303c42;
+  --muted:#64716f;
+  --brand:#176b75;
+  --brand-deep:#145f68;
+  --brand-soft:rgba(23,107,117,.08);
+  --gold:#7c5a24;
+  --gold-soft:rgba(184,135,58,.10);
+  --ok:#2f7d5c; --ok-soft:rgba(47,125,92,.10);
+  --warn:#8a5f1f; --warn-soft:rgba(184,135,58,.12);
+  --bad:#b3402a; --bad-soft:rgba(179,64,42,.09);
+  --zone-bad:#f0d8d2; --zone-chong:#f4e6cd;
+  --zone-wen:#d5e8df; --zone-bao:#cfe2e4;
+  --mask:rgba(23,32,38,.35);
+  --shadow:0 1px 2px rgba(32,42,48,.04), 0 14px 36px -22px rgba(28,39,51,.35);
+  --shadow-sm:0 1px 2px rgba(32,42,48,.05);
+  --grid-line:#e6eae6;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","HarmonyOS Sans SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:var(--fz-base);
+  background:var(--bg); color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:.01em;
+}
+button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+b,strong,h1,h2,h3,h4{font-weight:600}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+::selection{background:var(--brand-soft)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px;border:3px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--surface-3)}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ 骨架 ============ */
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ---- 左侧栏：暖白纸面 + 青绿选中态，不用深色块 ---- */
+.rail{
+  width:var(--rail-w);flex:0 0 var(--rail-w);
+  background:var(--surface);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:22px 12px 12px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px 22px}
+.brand-mark{
+  width:34px;height:34px;border-radius:10px;flex:0 0 34px;
+  background:var(--brand-soft);color:var(--brand);
+  border:1px solid rgba(23,107,117,.22);
+  font-weight:800;font-size:16px;
+  display:grid;place-items:center;
+}
+.brand-name{font-size:14px;font-weight:650;letter-spacing:.02em}
+.brand-sub{font-size:var(--fz-xs);color:var(--muted);margin-top:3px;letter-spacing:.14em}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;
+  color:var(--text-2);font-size:var(--fz-md);cursor:pointer;position:relative;
+  transition:background .16s var(--ease),color .16s var(--ease);
+}
+.nav-item:hover{background:var(--surface-3);color:var(--text)}
+.nav-item.on{background:var(--brand-soft);color:var(--brand);font-weight:600}
+.nav-item svg{width:16px;height:16px;flex:0 0 16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.nav-item .badge{
+  margin-left:auto;font-size:10px;padding:1px 6px;border-radius:20px;
+  background:var(--surface-3);color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;
+}
+.nav-item.on .badge{background:rgba(23,107,117,.12);color:var(--brand)}
+.rail-foot{margin-top:auto;padding:14px 8px 4px;border-top:1px solid var(--line-2);font-size:var(--fz-xs);color:var(--muted);line-height:1.9}
+.rail-foot b{color:var(--text-2);font-weight:600}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;background:var(--ok);margin-right:5px;vertical-align:1px}
+
+/* ---- 主区 ---- */
+.work{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{
+  height:58px;flex:0 0 58px;display:flex;align-items:center;gap:12px;
+  padding:0 22px;border-bottom:1px solid var(--line);background:var(--surface);
+}
+.search{position:relative;flex:1;max-width:400px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:1.8}
+.search input{
+  width:100%;height:34px;padding:0 34px 0 34px;border-radius:8px;
+  background:var(--surface-3);border:1px solid var(--line-2);outline:none;
+  font-size:var(--fz-md);transition:.16s var(--ease);
+}
+.search input::placeholder{color:var(--muted)}
+.search input:focus{background:var(--surface);border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.search kbd{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  font-size:10px;color:var(--muted);border:1px solid var(--line);
+  border-radius:4px;padding:1px 4px;font-family:inherit;background:var(--surface-2);
+}
+.score-in{
+  display:flex;align-items:center;gap:8px;height:34px;padding:0 10px 0 12px;
+  border:1px solid var(--line);border-radius:8px;background:var(--surface);
+}
+.score-in label{font-size:11px;color:var(--muted);white-space:nowrap;letter-spacing:.1em}
+.score-in input{
+  width:54px;border:none;background:none;outline:none;
+  font-size:16px;font-weight:800;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;color:var(--brand);
+}
+.score-in input::placeholder{color:var(--muted);font-weight:400;font-size:13px;letter-spacing:0}
+.score-in .unit{font-size:var(--fz-xs);color:var(--muted);margin-right:2px}
+.spacer{flex:1}
+.tbtn{
+  width:34px;height:34px;display:grid;place-items:center;border-radius:8px;
+  color:var(--text-2);transition:.16s var(--ease);
+}
+.tbtn:hover{background:var(--surface-3);color:var(--text)}
+.tbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;
+  border-radius:8px;border:1px solid var(--line);background:var(--surface);
+  font-size:var(--fz-md);color:var(--text-2);transition:.16s var(--ease);white-space:nowrap;
+}
+.btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+.btn.primary:hover{background:var(--brand-deep);border-color:var(--brand-deep);color:#fff}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme="dark"] .btn.primary{color:#0e1416}
+
+.main{flex:1;overflow-y:auto;padding:24px 30px 64px;scroll-behavior:smooth}
+.view{display:none;animation:fade .26s var(--ease)}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ============ 筛选区 ============ */
+.filterbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.fchip{position:relative}
+.fchip>button{
+  display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;
+  border:1px solid var(--line);border-radius:999px;background:var(--surface);
+  font-size:var(--fz-md);color:var(--text-2);transition:.16s var(--ease);
+}
+.fchip>button:hover{border-color:var(--brand);color:var(--brand)}
+.fchip>button .k{color:var(--muted);font-size:11px;letter-spacing:.12em}
+.fchip>button .v{font-weight:600;color:var(--text)}
+.fchip.active>button{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
+.fchip.active>button .v{color:var(--brand)}
+.fchip>button svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;opacity:.6}
+.pop{
+  position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:200px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+  box-shadow:var(--shadow);padding:8px;display:none;max-height:320px;overflow-y:auto;
+}
+.pop.on{display:block}
+.pop .opt{
+  display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:6px;
+  font-size:var(--fz-md);cursor:pointer;color:var(--text-2);
+}
+.pop .opt:hover{background:var(--surface-2);color:var(--text)}
+.pop .opt .box{
+  width:14px;height:14px;border:1.5px solid var(--line);border-radius:4px;flex:0 0 14px;
+  display:grid;place-items:center;
+}
+.pop .opt.sel .box{background:var(--brand);border-color:var(--brand)}
+.pop .opt.sel .box::after{content:"";width:6px;height:3px;border-left:1.6px solid #fff;border-bottom:1.6px solid #fff;transform:rotate(-45deg) translateY(-1px)}
+.pop .opt .cnt{margin-left:auto;font-size:var(--fz-xs);color:var(--muted);font-variant-numeric:tabular-nums}
+.pop .foot{display:flex;justify-content:space-between;padding:6px 9px 2px;margin-top:4px;border-top:1px solid var(--line-2);font-size:var(--fz-sm);color:var(--muted)}
+.pop .foot button{font-size:var(--fz-sm);color:var(--brand)}
+.pop .sep{height:1px;background:var(--line-2);margin:6px 2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;
+  background:var(--brand-soft);color:var(--brand);border-radius:6px;font-size:var(--fz-sm);font-weight:600;
+}
+.chip i{font-style:normal;cursor:pointer;opacity:.65;font-size:14px;line-height:1}
+.chip i:hover{opacity:1}
+
+/* ============ 结果头部 ============ */
+.main>.view{max-width:1160px;margin:0 auto}
+.res-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.res-head h1{font-size:var(--fz-lg);letter-spacing:.02em}
+.res-head .sub{font-size:var(--fz-sm);color:var(--muted);font-variant-numeric:tabular-nums}
+.res-head .legend{margin-left:auto;display:flex;gap:10px;font-size:var(--fz-sm);color:var(--muted);align-items:center}
+.lg{display:inline-flex;align-items:center;gap:4px}
+.lg em{width:7px;height:7px;border-radius:2px;font-style:normal;display:inline-block}
+
+/* ============ 院校卡 ============ */
+.prov-head{
+  position:sticky;top:-20px;z-index:8;padding:16px 0 7px;margin-top:4px;
+  background:linear-gradient(var(--bg) 74%,transparent);
+  display:flex;align-items:center;gap:10px;
+  font-size:var(--fz-xs);color:var(--muted);letter-spacing:.08em;
+  font-variant-numeric:tabular-nums;
+}
+.prov-head b{font-size:var(--fz-sm);color:var(--text-2);letter-spacing:.3em;font-weight:600}
+.prov-head .line{flex:1;height:1px;background:var(--line)}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  margin-bottom:8px;transition:border-color .18s var(--ease),box-shadow .18s var(--ease);
+  overflow:hidden;
+}
+.card:hover{border-color:var(--line-strong,#ccd4d0);box-shadow:var(--shadow-sm)}
+.card-main{display:flex;align-items:center;gap:13px;padding:13px 16px;cursor:pointer}
+.seal{
+  width:38px;height:38px;flex:0 0 38px;border-radius:9px;display:grid;place-items:center;
+  font-size:15px;font-weight:800;letter-spacing:0;
+  background:var(--surface-3);color:var(--text-2);border:1px solid var(--line);
+}
+.seal[data-t="985"]{background:var(--gold-soft);color:var(--gold);border-color:rgba(184,135,58,.24)}
+.seal[data-t="211"]{background:var(--brand-soft);color:var(--brand);border-color:rgba(23,107,117,.2)}
+.seal[data-t="财经类"]{background:var(--bad-soft);color:var(--bad);border-color:rgba(179,64,42,.18)}
+.c-id{min-width:0;flex:1}
+.c-name{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.c-name h3{font-size:15px;letter-spacing:.01em}
+.c-meta{font-size:var(--fz-sm);color:var(--muted);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.c-meta span{position:relative}
+.c-meta span+span::before{content:"·";margin-right:8px;opacity:.5}
+.tag{
+  font-size:10.5px;padding:1px 6px;border-radius:4px;font-weight:600;
+  background:var(--surface-3);color:var(--text-2);letter-spacing:.04em;
+}
+.tag[data-t="985"]{background:var(--gold-soft);color:var(--gold)}
+.tag[data-t="211"]{background:var(--brand-soft);color:var(--brand)}
+.tag[data-t="财经类"]{background:var(--bad-soft);color:var(--bad)}
+.tag[data-t="自划线"]{background:var(--warn-soft);color:var(--warn)}
+.metrics{display:flex;gap:22px;align-items:flex-end}
+.metric{text-align:right;width:96px;flex:0 0 96px}
+.metric .k{font-size:10.5px;color:var(--muted);display:block;letter-spacing:.1em;margin-bottom:2px}
+.metric .v{font-size:20px;font-weight:800;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1.2}
+.metric .v small{font-size:var(--fz-xs);font-weight:500;color:var(--muted);margin-left:2px;letter-spacing:0}
+.metric.hi .v{color:var(--brand)}
+.metric.dim .v{color:var(--muted);font-weight:500}
+.star{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;color:var(--line);transition:.16s var(--ease)}
+.star svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linejoin:round}
+.star:hover{background:var(--surface-3);color:var(--gold)}
+.star.on{color:var(--gold)}
+.star.on svg{fill:var(--gold);stroke:var(--gold)}
+
+/* 分差条：徽章 + 刻度 + 标记 */
+.matchrow{display:flex;align-items:center;gap:9px;padding:0 16px 11px 70px}
+.difftrack{position:relative;flex:0 0 112px;height:5px;border-radius:3px;background:var(--surface-3)}
+.difftrack .zi{position:absolute;top:0;bottom:0;border-radius:3px}
+.difftrack .zi.bad{left:0;width:37.5%;background:var(--zone-bad)}
+.difftrack .zi.chong{left:37.5%;width:12.5%;background:var(--zone-chong)}
+.difftrack .zi.wen{left:50%;width:12.5%;background:var(--zone-wen)}
+.difftrack .zi.bao{left:62.5%;width:37.5%;background:var(--zone-bao)}
+.difftrack .zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--muted);opacity:.5}
+.difftrack .mk{
+  position:absolute;top:50%;width:3px;height:14px;border-radius:2px;
+  transform:translate(-50%,-50%);background:var(--text);
+  box-shadow:0 0 0 2px var(--surface);
+}
+.matchrow.bao .mk{background:var(--brand)}
+.matchrow.wen .mk{background:var(--ok)}
+.matchrow.chong .mk{background:var(--warn)}
+.matchrow.none .mk{background:var(--bad)}
+.difftext{font-size:var(--fz-sm);font-weight:700;font-variant-numeric:tabular-nums;color:var(--text-2);letter-spacing:-.01em}
+.matchrow.bao .difftext{color:var(--brand)}
+.matchrow.wen .difftext{color:var(--ok)}
+.matchrow.chong .difftext{color:var(--warn)}
+.matchrow.none .difftext{color:var(--bad)}
+.mbadge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.04em}
+.mbadge.bao{background:var(--brand-soft);color:var(--brand);box-shadow:inset 0 0 0 1px rgba(23,107,117,.28)}
+:root[data-theme="dark"] .mbadge.bao{box-shadow:inset 0 0 0 1px rgba(74,168,178,.34)}
+.mbadge.wen{background:var(--ok-soft);color:var(--ok)}
+.mbadge.chong{background:var(--warn-soft);color:var(--warn)}
+.mbadge.none{background:var(--bad-soft);color:var(--bad)}
+
+/* 专业行 */
+.progs{border-top:1px solid var(--line-2);display:none}
+.card.open .progs{display:block}
+.prow{
+  display:grid;grid-template-columns:74px repeat(4,1fr);gap:0 14px;
+  padding:11px 16px;font-size:var(--fz-md);align-items:center;
+  border-bottom:1px solid var(--line-2);
+}
+.prow:last-child{border-bottom:none}
+.prow:hover{background:var(--surface-2)}
+.prow .pk{font-weight:650;color:var(--brand);font-size:var(--fz-sm)}
+.pcell .k{display:block;font-size:var(--fz-xs);color:var(--muted);margin-bottom:2px}
+.pcell .v{display:block;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcell .v.dim{color:var(--muted)}
+.empty{text-align:center;padding:70px 0;color:var(--muted)}
+.empty b{display:block;font-size:15px;color:var(--text-2);margin-bottom:6px}
+
+/* ============ 国家线 ============ */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:14px}
+.panel-h{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.panel-h h2{font-size:15px;letter-spacing:.02em}
+.panel-h .hint{font-size:var(--fz-sm);color:var(--muted);margin-left:auto}
+.chartbox{width:100%;height:260px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left;font-size:var(--fz-md);border-bottom:1px solid var(--line-2)}
+th{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.1em;background:var(--surface-3)}
+th:first-child{border-radius:8px 0 0 8px}
+th:last-child{border-radius:0 8px 8px 0}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:none}
+td.n{font-variant-numeric:tabular-nums}
+
+/* ============ 对比 ============ */
+.cmp-head{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.cmp-grid{display:grid;grid-template-columns:360px 1fr;gap:14px;align-items:start}
+.radar-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:10px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;padding:8px 10px 4px}
+.legend .li{display:flex;align-items:center;gap:5px;font-size:var(--fz-sm);color:var(--text-2)}
+.legend .li em{width:9px;height:9px;border-radius:3px;font-style:normal}
+.cmp-table td{vertical-align:top}
+.cmp-table td:first-child{color:var(--muted);width:104px;font-size:var(--fz-sm)}
+.cmp-table .clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.slot{border:1px dashed var(--line);border-radius:var(--r-md);padding:22px;text-align:center;color:var(--muted);font-size:var(--fz-md)}
+
+/* ============ 时间线 ============ */
+.tl{position:relative;padding:10px 0 0 0}
+.tl::before{content:"";position:absolute;left:15px;top:20px;bottom:10px;width:2px;background:var(--line)}
+.tl-item{position:relative;padding:0 0 20px 46px}
+.tl-dot{
+  position:absolute;left:9px;top:4px;width:14px;height:14px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--line);z-index:2;
+}
+.tl-item.done .tl-dot{background:var(--ok);border-color:var(--ok)}
+.tl-item.now .tl-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px var(--gold-soft)}
+.tl-date{font-size:var(--fz-sm);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:3px}
+.tl-item.now .tl-date{color:var(--gold);font-weight:600}
+.tl-title{font-size:var(--fz-base);font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.tl-desc{font-size:var(--fz-md);color:var(--muted);line-height:1.75}
+.badge-now{font-size:10px;background:var(--gold-soft);color:var(--gold);padding:1px 6px;border-radius:4px;font-weight:700}
+
+/* ============ 弹窗 ============ */
+.mask{
+  position:fixed;inset:0;background:var(--mask);z-index:200;display:none;
+  align-items:center;justify-content:center;padding:32px;backdrop-filter:blur(3px);
+}
+.mask.on{display:flex}
+.modal{
+  background:var(--bg);border:1px solid var(--line);border-radius:var(--r-xl);
+  width:min(880px,100%);max-height:86vh;overflow-y:auto;box-shadow:var(--shadow);
+  animation:pop .24s var(--ease);
+}
+.modal.wide{width:min(1100px,100%)}
+@keyframes pop{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:none}}
+.m-head{
+  display:flex;align-items:flex-start;gap:14px;padding:20px 22px 16px;
+  border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:2;
+}
+.m-head .seal{width:44px;height:44px;flex:0 0 44px;font-size:18px;border-radius:12px}
+.m-head h2{font-size:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.m-body{padding:18px 22px 22px}
+.close{margin-left:auto;width:30px;height:30px;display:grid;place-items:center;border-radius:8px;color:var(--muted)}
+.close:hover{background:var(--surface-2);color:var(--text)}
+.close svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+.pb{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px}
+.pb-h{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.pb-h b{font-size:var(--fz-base)}
+.pb-h .pill{font-size:var(--fz-xs);padding:1px 7px;border-radius:4px;background:var(--surface-3);color:var(--text-2);font-weight:600}
+.kv{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 22px;font-size:var(--fz-md)}
+.kv .row{display:flex;gap:8px;line-height:1.7}
+.kv .row .k{color:var(--muted);flex:0 0 62px;font-size:var(--fz-sm);padding-top:1px}
+.kv .row .v{color:var(--text-2);min-width:0}
+.full{grid-column:1/-1}
+.note{margin-top:12px;padding:10px 12px;background:var(--surface-2);border-radius:var(--r-sm);font-size:var(--fz-md);color:var(--text-2);line-height:1.8;border-left:2px solid var(--line)}
+.years{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.ybox{border:1px solid var(--line);border-radius:8px;padding:6px 12px;text-align:center;min-width:66px}
+.ybox b{display:block;font-size:16px;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.3}
+.ybox span{font-size:var(--fz-xs);color:var(--muted)}
+.srcs{display:flex;flex-wrap:wrap;gap:8px}
+.srcs a{font-size:var(--fz-sm);padding:3px 9px;border:1px solid var(--line);border-radius:20px;color:var(--text-2)}
+.srcs a:hover{border-color:var(--brand);color:var(--brand);text-decoration:none}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+
+/* ============ 对比浮条 ============ */
+.cmpbar{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(60px);
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:9px 10px 9px 16px;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow);z-index:150;transition:transform .28s var(--ease),opacity .28s;opacity:0;
+  max-width:min(720px,calc(100vw - 40px));flex-wrap:wrap;
+}
+.cmpbar.on{transform:translateX(-50%);opacity:1}
+.cmpbar .names{display:flex;gap:6px;flex-wrap:wrap;font-size:var(--fz-sm)}
+.cmpbar .nm{background:var(--surface-2);border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:5px;color:var(--text-2)}
+.cmpbar .nm i{font-style:normal;cursor:pointer;opacity:.5}
+.cmpbar .nm i:hover{opacity:1;color:var(--bad)}
+
+/* ============ toast ============ */
+#toast{
+  position:fixed;left:50%;top:20px;transform:translateX(-50%) translateY(-20px);
+  background:var(--surface-3);color:var(--text);border:1px solid var(--line);
+  padding:9px 16px;border-radius:10px;font-size:var(--fz-md);z-index:300;
+  box-shadow:var(--shadow);opacity:0;transition:.24s var(--ease);pointer-events:none;
+}
+#toast.on{opacity:1;transform:translateX(-50%)}
+
+/* ============ 打印报告 ============ */
+#report{display:none;padding:0}
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#fafafa;--line:#ddd;--text:#000;--text-2:#222;--muted:#555;--gold:#7a4f0a;--brand:#14509e}
+  html,body{height:auto;background:#fff}
+  .shell,.cmpbar,#toast,.mask{display:none!important}
+  #report{display:block!important;padding:0 4mm}
+  .r-title{font-size:22pt;margin-bottom:2mm}
+  .r-sub{font-size:10pt;color:#555;margin-bottom:6mm}
+  .r-sec{margin:6mm 0}
+  .r-sec h3{font-size:12pt;border-bottom:1px solid #ccc;padding-bottom:2mm;margin-bottom:3mm}
+  .r-kpi{display:flex;gap:6mm;margin:3mm 0}
+  .r-kpi div{border:1px solid #ddd;border-radius:2mm;padding:3mm 4mm;flex:1}
+  .r-kpi b{display:block;font-size:16pt}
+  .r-kpi span{font-size:8pt;color:#666}
+  table{font-size:9pt}
+  th,td{padding:2mm 2.5mm;border-bottom:1px solid #e5e5e5}
+  th{background:#f5f5f5}
+  tr{break-inside:avoid}
+  .r-foot{margin-top:8mm;font-size:8pt;color:#666;border-top:1px solid #ddd;padding-top:3mm;line-height:1.7}
+  @page{size:A4;margin:14mm}
+}
+
+/* ============ 小屏 ============ */
+@media (max-width:1080px){
+  .cmp-grid{grid-template-columns:1fr}
+  .metrics{gap:16px}
+  .metric{min-width:52px}
+}
+@media (max-width:820px){
+  :root{--rail-w:100%}
+  body{overflow-x:hidden}
+  .shell{flex-direction:column;height:auto;min-height:100vh;overflow:visible}
+  .rail{width:100%;flex:none;flex-direction:column;padding:12px 12px 0;border-right:none;border-bottom:1px solid var(--line);min-width:0}
+  .brand{padding-bottom:12px}
+  .nav{flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:10px;scrollbar-width:none;min-width:0}
+  .nav::-webkit-scrollbar{display:none}
+  .nav-item{white-space:nowrap;padding:8px 11px}
+  .nav-item.on::before{display:none}
+  .rail-foot{display:none}
+  .work{min-height:0}
+  .topbar{height:auto;flex-wrap:wrap;padding:10px 12px;gap:8px}
+  .topbar .search{order:3;flex:1 1 100%;max-width:none}
+  .topbar .spacer{display:none}
+  .topbar .btn-label{display:none}
+  .topbar .btn{padding:0 9px}
+  .score-in{order:1;margin-right:auto}
+  .main{padding:14px 12px 70px;overflow:visible}
+  .filterbar{gap:6px}
+  .res-head{flex-wrap:wrap;gap:6px 10px}
+  .res-head h1{white-space:nowrap}
+  .res-head .legend{margin-left:0;width:100%;gap:8px;font-size:var(--fz-xs)}
+  .card-main{flex-wrap:wrap;gap:10px;padding:12px}
+  .card-main .star{order:1;margin-left:auto}
+  .c-id{order:0}
+  .metrics{order:3;width:100%;justify-content:space-between;gap:6px;padding-top:10px;border-top:1px solid var(--line-2)}
+  .metric{text-align:left;min-width:0}
+  .metric .v{font-size:17px}
+  .matchrow{padding-left:12px;padding-right:12px;gap:8px}
+  .prow{grid-template-columns:1fr 1fr;gap:10px;padding:11px 12px}
+  .prow .pk{grid-column:1/-1}
+  .kv{grid-template-columns:1fr}
+  .modal{border-radius:0;max-height:100vh;height:100%}
+  .mask{padding:0}
+  .prov-head{position:static;background:none}
+  .cmp-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-mark">研</div>
+      <div>
+        <div class="brand-name">金融考研择校通</div>
+        <div class="brand-sub">2027 择校数据台</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="rail-foot">
+      <div><span class="dot"></span>数据版本 <b id="dataVer">—</b></div>
+      <div>收录 <b id="dataCount">—</b> 所院校 · 参考年份 2026</div>
+      <div style="margin-top:6px;opacity:.8">数据仅供择校参考，以研招网为准</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="topbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="搜索院校 / 城市 / 省份…">
+        <kbd>/</kbd>
+      </div>
+      <div class="score-in">
+        <label for="score">预估分</label>
+        <input id="score" type="number" min="0" max="500" placeholder="370">
+        <span class="unit">分</span>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" id="btnReport" title="生成择校报告 PDF">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>
+        <span class="btn-label">择校报告</span>
+      </button>
+      <button class="tbtn" id="btnTheme" title="切换主题">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+      </button>
+    </header>
+
+    <main class="main" id="main">
+      <!-- 院校查询 -->
+      <section class="view on" id="v-query">
+        <div class="filterbar" id="filterbar"></div>
+        <div class="chips" id="chips"></div>
+        <div class="res-head">
+          <h1 id="resTitle">全部院校</h1>
+          <span class="sub" id="resSub"></span>
+          <div class="legend">
+            <span class="lg"><em style="background:var(--brand)"></em>保底</span>
+            <span class="lg"><em style="background:var(--ok)"></em>稳妥</span>
+            <span class="lg"><em style="background:var(--warn)"></em>冲刺</span>
+            <span class="lg"><em style="background:var(--bad)"></em>差距大</span>
+          </div>
+        </div>
+        <div id="results"></div>
+      </section>
+
+      <!-- 国家线 -->
+      <section class="view" id="v-national">
+        <div class="panel">
+          <div class="panel-h">
+            <h2>经济学门类国家线趋势</h2>
+            <span class="hint">2022–2026 · 总分</span>
+          </div>
+          <div class="chartbox" id="lineChart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>历年国家线明细</h2><span class="hint">单科：满分 100 / 满分 &gt;100</span></div>
+          <div id="nationalTable"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>A 区 / B 区</h2></div>
+          <p style="font-size:var(--fz-md);color:var(--muted);line-height:1.9">
+            A 区：北京、天津、河北、山西、辽宁、吉林、黑龙江、上海、江苏、浙江、安徽、福建、江西、山东、河南、湖北、湖南、广东、重庆、四川、陕西（21 省市）<br>
+            B 区：内蒙古、广西、海南、贵州、云南、西藏、甘肃、青海、宁夏、新疆（10 省区）<br>
+            B 区总分线一般比 A 区低 10 分左右，单科低 3~5 分。报考 A 区院校的考生可调剂至 B 区，反之不可。
+          </p>
+        </div>
+      </section>
+
+      <!-- 对比 -->
+      <section class="view" id="v-compare">
+        <div class="cmp-head">
+          <h1 style="font-size:var(--fz-lg)">院校对比</h1>
+          <div class="spacer"></div>
+          <div class="fchip" id="cmpProgChip"></div>
+          <button class="btn" id="btnCmpCsv">导出 CSV</button>
+          <button class="btn" id="btnCmpClear">清空</button>
+        </div>
+        <div id="cmpBody"></div>
+      </section>
+
+      <!-- 收藏 -->
+      <section class="view" id="v-fav">
+        <div class="res-head">
+          <h1>我的收藏</h1>
+          <span class="sub" id="favSub"></span>
+          <div class="spacer"></div>
+          <button class="btn" id="btnFavCsv">导出收藏 CSV</button>
+        </div>
+        <div id="favBody"></div>
+      </section>
+
+      <!-- 时间线 -->
+      <section class="view" id="v-timeline">
+        <div class="panel">
+          <div class="panel-h"><h2>2027 届考研节奏</h2><span class="hint">以 2026 年 10 月为当前进度</span></div>
+          <div class="tl" id="timeline"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>数据更新状态</h2><span class="hint">按参考年份统计</span></div>
+          <div id="yearStat"></div>
+        </div>
+      </section>
+
+      <!-- 数据质量 -->
+      <section class="view" id="v-data">
+        <div class="panel">
+          <div class="panel-h"><h2>字段完整度</h2><span class="hint">341 个招生方向 · 点击查看缺口清单</span></div>
+          <div id="quality"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>资料最缺的院校</h2><span class="hint">优先补这些</span></div>
+          <div id="gapList"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="cmpbar" id="cmpbar">
+  <span style="font-size:var(--fz-sm);color:var(--muted)">已选对比</span>
+  <div class="names" id="cmpNames"></div>
+  <button class="btn primary" id="btnGoCmp">开始对比</button>
+</div>
+
+<div class="mask" id="mask"><div class="modal" id="modal"></div></div>
+<div id="toast"></div>
+
+<!-- 打印用报告 -->
+<div id="report"></div>
+
+<script>
+window.__DATA__ = __DATA_JSON__;
+</script>
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   常量与工具
+   ============================================================ */
+const PROVS = ["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","西藏","陕西","甘肃","青海","宁夏","新疆"];
+const YEARS = [2027, 2026, 2025, 2024];
+const TAGS = ["985","211","双一流","财经类","自划线"];
+const ALL = window.__DATA__.schools;
+const NAT = window.__DATA__.national;
+const DATA_VER = window.__DATA__.version || 'v1.4.0';
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => (v == null || !isFinite(v)) ? null : v;
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* ---- 学费：统一折算「全程万元」 ---- */
+function parseYears(d){ const m = String(d||'').match(/([\d.]+)/); return m ? parseFloat(m[1]) : null; }
+function feeYears(p){ return parseYears((p||{}).d) || 2; }
+/**
+ * 学费口径混杂（「8000元/年」与「13万/全程」），还有「光华18.8万 / 经院10万」这种
+ * 一个字段里塞多个数字的写法。这里统一拆成区间：
+ *   按年计价的 × 学制；全程计价的直接取；多个数字给出 min~max，不再只取第一个。
+ */
+function feeRange(p){
+  const s = String((p||{}).f || '').replace(/,/g,'');
+  if (!s || /待核实/.test(s)) return null;
+  const isTotal = /全程|总额|合计/.test(s);
+  let nums = [...s.matchAll(/([\d.]+)\s*(万|元)/g)].map(m => {
+    const n = parseFloat(m[1]);
+    return m[2] === '万' ? n : n / 10000;
+  }).filter(n => n > 0 && n < 80);
+  if (!nums.length) return null;
+  if (!isTotal) nums = nums.slice(0,1).map(n => n * feeYears(p));
+  const uniq = [...new Set(nums.map(n => Math.round(n*10)/10))].sort((a,b)=>a-b);
+  return { min: uniq[0], max: uniq[uniq.length-1], multi: uniq.length > 1 };
+}
+function feeTotalWan(p){
+  const r = feeRange(p);
+  return r ? r.min : Infinity;
+}
+function parseCount(str){
+  if (!str) return null;
+  const s = String(str);
+  const cands = [...s.matchAll(/(\d+(?:\.\d+)?)\s*[人名]/g)].map(m => ({
+    v: parseFloat(m[1]),
+    near: s.slice(Math.max(0,m.index-5), m.index),
+    before: s.slice(Math.max(0,m.index-10), m.index)
+  })).filter(c => !/推免|保研/.test(c.near));
+  if (!cands.length) return null;
+  const pick = kws => cands.find(c => kws.some(k => c.before.includes(k)));
+  const hit = pick(['录取']) || pick(['招生','拟招','计划','指标']) || cands[0];
+  return hit.v;
+}
+function latestLine(p){
+  if (!p || !p.l) return null;
+  const y = YEARS.find(y => p.l[y] > 0);
+  return y ? { year:y, val:p.l[y] } : null;
+}
+function approxLine(p){
+  if (!p || !p.la) return null;
+  const cleaned = String(p.la).replace(/(19|20)\d{2}/g,' ');
+  const nums = [...cleaned.matchAll(/\d+/g)].map(m => parseInt(m[0],10));
+  const hit = nums.find(v => v >= 200 && v <= 500);
+  return hit || null;
+}
+function lineOf(p){ const l = latestLine(p); return l ? l.val : approxLine(p); }
+function matchOf(line, score){
+  if (line == null || !score) return null;
+  const d = score - line;
+  if (d >= 15) return { key:'bao', label:'保底', diff:d };
+  if (d >= 0)  return { key:'wen', label:'稳妥', diff:d };
+  if (d >= -15)return { key:'chong', label:'冲刺', diff:d };
+  return { key:'none', label:'差距大', diff:d };
+}
+function filledCount(s){
+  let n = 0;
+  for (const k of ['z','x']){
+    const p = s[k]; if (!p) continue;
+    for (const f of ['m','j','f','d','e','a','bk','emp']) if (p[f] && !/^待核实$/.test(String(p[f]))) n++;
+    if (p.l && Object.keys(p.l).length) n++;
+  }
+  return n;
+}
+function hostOf(u){ try{ return new URL(u).host.replace(/^www\./,''); }catch(e){ return String(u).slice(0,24); } }
+function tierOf(s){
+  const t = s.tags || [];
+  if (t.includes('985')) return '985';
+  if (t.includes('211')) return '211';
+  if (t.includes('财经类')) return '财经类';
+  return '';
+}
+function feeText(p){
+  const r = feeRange(p);
+  if (!r) return { v:'待核实', small:'', dim:true };
+  return { v: r.multi ? `${r.min}~${r.max}` : `${r.min}`, small:'万' };
+}
+function toCsv(rows){
+  return '\uFEFF' + rows.map(r => r.map(c => {
+    const v = String(c == null ? '' : c).replace(/"/g,'""');
+    return /[",\n]/.test(v) ? '"'+v+'"' : v;
+  }).join(',')).join('\r\n');
+}
+function download(name, text, mime){
+  const blob = new Blob([text], {type: mime || 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+let toastTimer;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('on'), 2000);
+}
+
+/* ============================================================
+   状态
+   ============================================================ */
+const S = {
+  view: 'query',
+  q: '',
+  provs: new Set(),
+  tags: new Set(),
+  math: '',
+  complete: '',
+  sort: 'default',
+  score: store.get('v2-score', null),
+  fav: new Set(store.get('v2-fav', [])),
+  cmp: store.get('v2-cmp', []),
+  cmpProg: 'z',
+  theme: store.get('v2-theme', 'auto')
+};
+
+/* ============================================================
+   筛选
+   ============================================================ */
+const SORTS = [
+  {v:'default', label:'默认（按省份）'},
+  {v:'line',    label:'复试线 高 → 低'},
+  {v:'diff',    label:'按分差 近 → 远'},
+  {v:'fee',     label:'学费 低 → 高'},
+  {v:'enroll',  label:'录取人数 多 → 少'},
+  {v:'complete',label:'资料完整度 高 → 低'}
+];
+const COMPLETES = [
+  {v:'', label:'不限'},
+  {v:'line', label:'有精确复试线'},
+  {v:'fee', label:'有学费'},
+  {v:'enroll', label:'有录取人数'},
+  {v:'rich', label:'资料较全（≥5 项）'}
+];
+
+/** 按当前条件过滤（不含搜索外的视图差异） */
+function filterSchools(){
+  const q = S.q.trim().toLowerCase();
+  let list = ALL.filter(s => {
+    if (q && !((s.name+' '+s.city+' '+s.prov).toLowerCase().includes(q))) return false;
+    if (S.provs.size && !S.provs.has(s.prov)) return false;
+    if (S.tags.size && !(s.tags||[]).some(t => S.tags.has(t))) return false;
+    const p = progOf(s);
+    if (!p) return false;
+    if (S.math){
+      const m = String(p.m || '');
+      if (S.math === '数三' && !/数三|数学三/.test(m)) return false;
+      if (S.math === '396' && !/396/.test(m)) return false;
+    }
+    if (S.complete){
+      const px = s.z ? lineOf(s.z) : null;
+      const fee = s.z ? feeTotalWan(s.z) : Infinity;
+      const e = s.z ? parseCount(s.z.e) : null;
+      if (S.complete === 'line' && px == null) return false;
+      if (S.complete === 'fee' && !isFinite(fee)) return false;
+      if (S.complete === 'enroll' && !e) return false;
+      if (S.complete === 'rich' && filledCount(s) < 5) return false;
+    }
+    return true;
+  });
+  const line = p => lineOf(p) || -1;
+  const cmp = {
+    default: (a,b) => (PROVS.indexOf(a.prov)-PROVS.indexOf(b.prov)) || ((f=>f)(0)) || a.name.localeCompare(b.name,'zh'),
+    line: (a,b) => line(progOf(b)) - line(progOf(a)),
+    fee: (a,b) => (feeTotalWan(progOf(a)) === Infinity ? 1e9 : feeTotalWan(progOf(a))) - (feeTotalWan(progOf(b)) === Infinity ? 1e9 : feeTotalWan(progOf(b))),
+    enroll: (a,b) => (parseCount((progOf(b)||{}).e)||-1) - (parseCount((progOf(a)||{}).e)||-1),
+    complete: (a,b) => filledCount(b) - filledCount(a),
+    diff: (a,b) => {
+      const da = matchOf(lineOf(progOf(a)), S.score), db = matchOf(lineOf(progOf(b)), S.score);
+      return Math.abs(da ? da.diff : 999) - Math.abs(db ? db.diff : 999);
+    }
+  }[S.sort] || null;
+  if (cmp) list.sort(cmp);
+  return list;
+}
+/** 当前展示的 program：专硕优先，没有则学硕 */
+function progOf(s){ return s.z || s.x || null; }
+function progKeyOf(s){ return s.z ? 'z' : (s.x ? 'x' : null); }
+
+/* ============================================================
+   筛选栏（chips + 弹出面板）
+   ============================================================ */
+function popHTML(kind, opts, sel, multi){
+  return opts.map(o => {
+    const on = multi ? sel.has(o.v) : sel === o.v;
+    return `<div class="opt ${on?'sel':''}" data-kind="${kind}" data-v="${esc(o.v)}"><span class="box"></span><span>${esc(o.label)}</span>${o.cnt!=null?`<span class="cnt">${o.cnt}</span>`:''}</div>`;
+  }).join('');
+}
+function buildFilterBar(){
+  const provCount = {};
+  ALL.forEach(s => provCount[s.prov] = (provCount[s.prov]||0)+1);
+  const provOpts = PROVS.filter(p => provCount[p]).map(p => ({v:p, label:p, cnt:provCount[p]}));
+  const tagCount = {};
+  ALL.forEach(s => (s.tags||[]).forEach(t => tagCount[t]=(tagCount[t]||0)+1));
+  const tagOpts = TAGS.map(t => ({v:t, label:t, cnt:tagCount[t]||0}));
+  const mathOpts = [{v:'',label:'不限'},{v:'数三',label:'数学三'},{v:'396',label:'396 经综'}];
+
+  $('#filterbar').innerHTML = `
+    <div class="fchip" data-menu="prov"><button><span class="k">省份</span><span class="v" data-lbl="prov">全部</span>
+      <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop">${popHTML('prov', provOpts, S.provs, true)}
+        <div class="foot"><span>可多选</span><button data-clear="prov">清除</button></div></div></div>
+    <div class="fchip" data-menu="tag"><button><span class="k">层次</span><span class="v" data-lbl="tag">全部</span>
+      <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop">${popHTML('tag', tagOpts, S.tags, true)}
+        <div class="foot"><span>可多选</span><button data-clear="tag">清除</button></div></div></div>
+    <div class="fchip" data-menu="math"><button><span class="k">数学</span><span class="v" data-lbl="math">不限</span>
+      <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop">${popHTML('math', mathOpts, S.math, false)}</div></div>
+    <div class="fchip" data-menu="complete"><button><span class="k">资料</span><span class="v" data-lbl="complete">不限</span>
+      <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop">${popHTML('complete', COMPLETES, S.complete, false)}</div></div>
+    <div class="fchip" data-menu="sort"><button><span class="k">排序</span><span class="v" data-lbl="sort">默认</span>
+      <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop">${popHTML('sort', SORTS, S.sort, false)}</div></div>
+    <div class="spacer"></div>
+    <button class="btn" id="btnCsv">
+      <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>
+      导出 CSV</button>
+  `;
+  updateFilterLabels();
+  bindFilterEvents();
+}
+function updateFilterLabels(){
+  const set = (k, txt, on) => {
+    const el = $(`[data-lbl="${k}"]`); if (!el) return;
+    el.textContent = txt;
+    el.closest('.fchip').classList.toggle('active', !!on);
+  };
+  set('prov', S.provs.size ? `${S.provs.size} 个省份` : '全部', S.provs.size);
+  set('tag', S.tags.size ? [...S.tags].join(' / ') : '全部', S.tags.size);
+  set('math', { '':'不限', '数三':'数学三', '396':'396 经综' }[S.math], S.math);
+  set('complete', (COMPLETES.find(c=>c.v===S.complete)||{}).label || '不限', S.complete);
+  set('sort', (SORTS.find(s=>s.v===S.sort)||{}).label.replace('（按省份）',''), S.sort !== 'default');
+  // 已选条件 chips
+  const chips = [];
+  S.provs.forEach(p => chips.push({t:'省', v:p, kind:'prov'}));
+  S.tags.forEach(t => chips.push({t:'层', v:t, kind:'tag'}));
+  if (S.score) chips.push({t:'预估', v:`${S.score} 分`, kind:'score'});
+  $('#chips').innerHTML = chips.map(c =>
+    `<span class="chip">${esc(c.v)}<i data-rm="${c.kind}" data-v="${esc(c.v)}">×</i></span>`
+  ).join('');
+}
+function bindFilterEvents(){
+  $$('.fchip > button').forEach(b => {
+    b.onclick = e => {
+      const chip = b.closest('.fchip');
+      const was = chip.classList.contains('open');
+      $$('.fchip').forEach(c => { c.classList.remove('open'); c.querySelector('.pop').classList.remove('on'); });
+      if (!was){ chip.classList.add('open'); chip.querySelector('.pop').classList.add('on'); }
+      e.stopPropagation();
+    };
+  });
+  $$('.pop .opt').forEach(o => {
+    o.onclick = e => {
+      e.stopPropagation();
+      const kind = o.dataset.kind, v = o.dataset.v;
+      if (kind === 'prov'){ S.provs.has(v) ? S.provs.delete(v) : S.provs.add(v); }
+      else if (kind === 'tag'){ S.tags.has(v) ? S.tags.delete(v) : S.tags.add(v); }
+      else if (kind === 'math'){ S.math = (S.math === v) ? '' : v; }
+      else if (kind === 'complete'){ S.complete = v; }
+      else if (kind === 'sort'){ S.sort = v; }
+      // 就地更新选中态，弹层不关（多选体验）
+      const multi = kind === 'prov' || kind === 'tag';
+      if (multi){ o.classList.toggle('sel'); }
+      else {
+        o.closest('.pop').querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+        o.classList.add('sel');
+        o.closest('.fchip').querySelector('.pop').classList.remove('on');
+        o.closest('.fchip').classList.remove('open');
+      }
+      updateFilterLabels(); renderQuery();
+    };
+  });
+  $$('.pop [data-clear]').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      const k = b.dataset.clear;
+      if (k === 'prov') S.provs.clear(); else if (k === 'tag') S.tags.clear();
+      b.closest('.pop').querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+      updateFilterLabels(); renderQuery();
+    };
+  });
+  const csv = $('#btnCsv'); if (csv) csv.onclick = exportCsv;
+}
+document.addEventListener('click', () => $$('.fchip').forEach(c => {
+  c.classList.remove('open');
+  const pop = c.querySelector('.pop');   // 对比页的 chip 是动态生成的，可能还没有 pop
+  if (pop) pop.classList.remove('on');
+}));
+$('#chips').addEventListener('click', e => {
+  const i = e.target.closest('[data-rm]'); if (!i) return;
+  const k = i.dataset.rm, v = i.dataset.v;
+  if (k === 'prov') S.provs.delete(v);
+  else if (k === 'tag') S.tags.delete(v);
+  else if (k === 'score'){ S.score = null; $('#score').value = ''; store.set('v2-score', null); }
+  updateFilterLabels(); renderQuery();
+});
+
+/* ============================================================
+   院校卡
+   ============================================================ */
+function tagHTML(tags){
+  return (tags||[]).map(t => `<span class="tag" data-t="${esc(t)}">${esc(t)}</span>`).join('');
+}
+function metricHTML(k, v, small, hi, dim){
+  return `<div class="metric ${hi?'hi':''}${dim?' dim':''}"><span class="k">${k}</span><span class="v">${v}${small?`<small>${small}</small>`:''}</span></div>`;
+}
+function diffBar(m){
+  const pos = clamp(50 + m.diff / 60 * 50, 2, 98);
+  return `<div class="matchrow ${m.key}">
+    <span class="mbadge ${m.key}">${m.label}</span>
+    <div class="difftrack">
+      <span class="zi bad"></span><span class="zi chong"></span><span class="zi wen"></span><span class="zi bao"></span>
+      <span class="zero"></span>
+      <span class="mk" style="left:${pos}%"></span>
+    </div>
+    <span class="difftext">${m.diff>0?'+':''}${m.diff} 分</span>
+  </div>`;
+}
+function cardHTML(s){
+  const key = progKeyOf(s), p = s[key] || {};
+  const l = latestLine(p), ln = lineOf(p);
+  const m = matchOf(ln, S.score);
+  const fee = feeText(p);
+  const e = parseCount(p.e);
+  const open = S.openId === s.id;
+  return `<article class="card ${open?'open':''}" data-id="${esc(s.id)}">
+    <div class="card-main" data-detail="${esc(s.id)}">
+      <div class="seal" data-t="${tierOf(s)}">${esc(s.name.slice(0,1))}</div>
+      <div class="c-id">
+        <div class="c-name"><h3>${esc(s.name)}</h3>${tagHTML(s.tags)}</div>
+        <div class="c-meta"><span>${esc(s.prov)}${s.city&&s.city!==s.prov?'·'+esc(s.city):''}</span><span>${s.x?'学硕':'仅专硕'}${s.z&&s.x?' / 专硕':''}</span><span>资料完整度 ${filledCount(s)}</span></div>
+      </div>
+      <div class="metrics">
+        ${metricHTML('复试线' + (l ? ' ' + l.year : ''), l ? l.val : (ln ? '≈'+ln : '—'), '', !!l, !l && !ln)}
+        ${metricHTML('学费全程', fee.v, fee.small, !fee.dim, fee.dim)}
+        ${metricHTML('录取', e ? e : '—', e?'人':'', false, !e)}
+      </div>
+      <button class="star ${S.fav.has(s.id)?'on':''}" data-fav="${esc(s.id)}" title="收藏">
+        <svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.9 6.3.7-4.7 4.4 1.3 6.3L12 17l-5.6 3.3 1.3-6.3L3 9.6l6.3-.7z"/></svg>
+      </button>
+    </div>
+    ${m ? diffBar(m) : ''}
+    <div class="progs">
+      ${s.z ? prowHTML(s,'z') : ''}
+      ${s.x ? prowHTML(s,'x') : ''}
+    </div>
+  </article>`;
+}
+function prowHTML(s, key){
+  const p = s[key] || {};
+  const l = latestLine(p), ln = lineOf(p);
+  const m = matchOf(ln, S.score);
+  const lineTxt = l ? `<b>${l.val}</b> <span style="color:var(--muted);font-size:11px">${l.year}</span>` : (ln ? `<span style="color:var(--warn)">≈ ${ln}</span>` : '<span class="dim">待核实</span>');
+  const fee = feeText(p);
+  const e = parseCount(p.e);
+  return `<div class="prow">
+    <span class="pk">${key==='z'?'金融专硕':'金融学硕'}${m?` <span class="mbadge ${m.key}">${m.label}</span>`:''}</span>
+    <span class="pcell"><span class="k">复试线</span><span class="v num">${lineTxt}</span></span>
+    <span class="pcell"><span class="k">学费 / 学制</span><span class="v">${fee.dim?'<span class="dim">待核实</span>':fee.v+'万'}${p.d?' · '+esc(p.d):''}</span></span>
+    <span class="pcell"><span class="k">录取人数</span><span class="v num">${e?e+' 人':'<span class="dim">—</span>'}</span></span>
+    <span class="pcell"><span class="k">初试科目</span><span class="v" title="${esc((p.m||'')+(p.j?' + '+p.j:''))}">${esc((p.m||'待核实'))}${p.j?' + '+esc(p.j):''}</span></span>
+  </div>`;
+}
+
+/* ============================================================
+   渲染：院校查询
+   ============================================================ */
+function renderQuery(){
+  const list = filterSchools();
+  const fav = list.filter(s => S.fav.has(s.id));
+  const lineCount = list.filter(s => lineOf(progOf(s)) != null).length;
+  $('#resTitle').textContent = S.provs.size === 1 ? [...S.provs][0] : '全部院校';
+  $('#resSub').textContent = `${list.length} 所 · 有复试线 ${lineCount} 所${S.score?` · 预估 ${S.score} 分`:''}`;
+
+  if (!list.length){
+    $('#results').innerHTML = `<div class="empty"><b>没有符合条件的院校</b>试试放宽筛选，或清空搜索关键词</div>`;
+    return;
+  }
+  let html = '', cur = '';
+  for (const s of list){
+    if (s.prov !== cur){
+      cur = s.prov;
+      html += `<div class="prov-head"><b>${esc(cur)}</b><span class="line"></span><span>${list.filter(x=>x.prov===cur).length} 所</span></div>`;
+    }
+    html += cardHTML(s);
+  }
+  $('#results').innerHTML = html;
+  bindCards('#results');
+}
+function bindCards(scope){
+  const root = $(scope);
+  if (!root) return;
+  root.querySelectorAll('[data-detail]').forEach(el => {
+    el.onclick = () => openDetail(el.dataset.detail);
+  });
+  root.querySelectorAll('[data-fav]').forEach(el => {
+    el.onclick = e => { e.stopPropagation(); toggleFav(el.dataset.fav); };
+  });
+}
+function toggleFav(id){
+  if (S.fav.has(id)) S.fav.delete(id); else S.fav.add(id);
+  store.set('v2-fav', [...S.fav]);
+  $$(`[data-fav="${id}"]`).forEach(b => b.classList.toggle('on', S.fav.has(id)));
+  renderNav();
+  if (S.view === 'fav') renderFav();
+  toast(S.fav.has(id) ? '已收藏' : '已取消收藏');
+}
+
+/* ============================================================
+   详情弹窗
+   ============================================================ */
+function openDetail(id){
+  const s = ALL.find(x => x.id === id); if (!s) return;
+  const key = progKeyOf(s);
+  const head = `
+    <div class="m-head">
+      <div class="seal" data-t="${tierOf(s)}">${esc(s.name.slice(0,1))}</div>
+      <div>
+        <h2>${esc(s.name)} ${tagHTML(s.tags)}</h2>
+        <div class="c-meta" style="margin-top:5px"><span>${esc(s.prov)}${s.city&&s.city!==s.prov?'·'+esc(s.city):''}</span><span>资料完整度 ${filledCount(s)} 项</span></div>
+      </div>
+      <button class="close" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>`;
+  const blocks = ['z','x'].filter(k => s[k]).map(k => {
+    const p = s[k];
+    const l = latestLine(p), ln = lineOf(p), m = matchOf(ln, S.score);
+    const fee = feeText(p), e = parseCount(p.e), a = parseCount(p.a);
+    const yrs = Object.keys(p.l||{}).sort((a,b)=>b-a);
+    return `<div class="pb">
+      <div class="pb-h"><b>${k==='z'?'金融专硕（0251）':'金融学硕（0202）'}</b>
+        ${m?`<span class="mbadge ${m.key}">${m.label} ${m.diff>0?'+':''}${m.diff}</span>`:''}
+        ${l?`<span class="pill">${l.year} 复试线 ${l.val}</span>`:''}</div>
+      <div class="kv">
+        <div class="row"><span class="k">复试线</span><span class="v num">${l?`${l.val} 分（${l.year}）`:ln?`≈ ${ln}`:'待核实'}</span></div>
+        <div class="row"><span class="k">学费</span><span class="v">${p.f?esc(p.f):'待核实'}</span></div>
+        <div class="row"><span class="k">学制</span><span class="v">${p.d?esc(p.d):'—'}</span></div>
+        <div class="row"><span class="k">录取</span><span class="v num">${e?e+' 人':'—'}${a?` · 报名 ${a} 人` : ''}${e&&a?` · 报录比 ${(a/e).toFixed(1)}:1`:''}</span></div>
+        <div class="row"><span class="k">初试</span><span class="v">${esc(p.m||'待核实')}${p.j?' + '+esc(p.j):''}</span></div>
+        <div class="row"><span class="k">全程学费</span><span class="v num">${fee.dim?'待核实':fee.v+' 万'}</span></div>
+        ${p.bk?`<div class="row full"><span class="k">参考书</span><span class="v">${esc(p.bk)}</span></div>`:''}
+        ${p.emp?`<div class="row full"><span class="k">就业</span><span class="v">${esc(p.emp)}</span></div>`:''}
+      </div>
+      ${yrs.length>1?`<div class="years">${yrs.map(y=>`<div class="ybox"><b>${p.l[y]}</b><span>${y}</span></div>`).join('')}</div>`:''}
+      ${p.nt?`<div class="note">${esc(p.nt)}</div>`:''}
+    </div>`;
+  }).join('');
+  const srcs = (s.sources||[]).length ? `<div class="pb">
+      <div class="pb-h"><b>数据核实来源</b></div>
+      <div class="srcs">${s.sources.map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))}</a>`).join('')}</div>
+    </div>` : '';
+  $('#modal').innerHTML = head + `<div class="m-body">
+    ${s.note?`<div class="note" style="margin-top:0;margin-bottom:12px"><b style="font-size:11px;letter-spacing:.16em;color:var(--muted);display:block;margin-bottom:3px;font-weight:600">院校备注</b>${esc(s.note)}</div>`:''}
+    ${blocks}${srcs}
+    <div class="acts">
+      <button class="btn" data-close>关闭</button>
+      <button class="btn" data-addcmp="${esc(s.id)}">加入对比</button>
+      <button class="btn primary" data-fav2="${esc(s.id)}">${S.fav.has(s.id)?'取消收藏':'收藏'}</button>
+    </div>
+  </div>`;
+  $('#mask').classList.add('on');
+  $('#modal').scrollTop = 0;
+  $$('#modal [data-close]').forEach(b => b.onclick = closeModal);
+  const add = $('#modal [data-addcmp]');
+  if (add) add.onclick = () => { addCmp(add.dataset.addcmp); closeModal(); };
+  const f2 = $('#modal [data-fav2]');
+  if (f2) f2.onclick = () => { toggleFav(f2.dataset.fav2); closeModal(); };
+}
+function closeModal(){ $('#mask').classList.remove('on'); }
+$('#mask').onclick = e => { if (e.target.id === 'mask') closeModal(); };
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === '/' && document.activeElement !== $('#q')){ e.preventDefault(); $('#q').focus(); }
+});
+
+/* ============================================================
+   对比
+   ============================================================ */
+function addCmp(id){
+  if (S.cmp.includes(id)){ toast('已在对比列表'); return; }
+  if (S.cmp.length >= 4){ toast('最多对比 4 所'); return; }
+  S.cmp.push(id); store.set('v2-cmp', S.cmp);
+  renderCmpBar(); renderNav();
+  toast('已加入对比（' + S.cmp.length + '/4）');
+}
+function renderCmpBar(){
+  const bar = $('#cmpbar');
+  if (!S.cmp.length){ bar.classList.remove('on'); return; }
+  bar.classList.add('on');
+  $('#cmpNames').innerHTML = S.cmp.map(id => {
+    const s = ALL.find(x=>x.id===id);
+    return `<span class="nm">${esc(s?s.name:id)}<i data-rmcmp="${esc(id)}">×</i></span>`;
+  }).join('');
+  $$('#cmpNames [data-rmcmp]').forEach(i => {
+    i.onclick = () => { S.cmp = S.cmp.filter(x=>x!==i.dataset.rmcmp); store.set('v2-cmp', S.cmp); renderCmpBar(); renderNav(); if (S.view==='compare') renderCompare(); };
+  });
+}
+$('#btnGoCmp').onclick = () => switchView('compare');
+$('#btnCmpClear').onclick = () => { S.cmp = []; store.set('v2-cmp', []); renderCmpBar(); renderCompare(); renderNav(); };
+
+/* 雷达图：5 维归一化，越大越好 */
+const RADAR_DIMS = [
+  {k:'上岸友好', get: s => { const l = lineOf(progOf(s)); return l ? 500 - l : null; }, hint:'复试线越低越友好'},
+  {k:'学费友好', get: s => { const w = feeTotalWan(progOf(s)); return isFinite(w) ? 60 - w : null; }, hint:'全程学费越低越友好'},
+  {k:'招生规模', get: s => parseCount((progOf(s)||{}).e), hint:'录取人数越多越好'},
+  {k:'资料完整', get: s => filledCount(s), hint:'已填字段数'},
+  {k:'科目友好', get: s => { const m = String((progOf(s)||{}).m||''); return /396/.test(m) ? 100 : /数三|数学三/.test(m) ? 55 : 60; }, hint:'考 396 比数三友好'}
+];
+function radarData(ids, key){
+  const objs = ids.map(id => ALL.find(x=>x.id===id)).filter(Boolean);
+  const vals = RADAR_DIMS.map(d => objs.map(s => {
+    const p = s[key] || progOf(s);
+    if (d.k === '上岸友好'){ const l = lineOf(p); return l ? 500 - l : null; }
+    if (d.k === '学费友好'){ const w = feeTotalWan(p); return isFinite(w) ? 60 - w : null; }
+    if (d.k === '招生规模') return parseCount(p.e);
+    if (d.k === '资料完整') return filledCount(s);
+    const m = String(p.m||''); return /396/.test(m) ? 3 : /数三|数学三/.test(m) ? 2 : 2.2;
+  }));
+  return { objs, vals };
+}
+function radarSVG(ids, key){
+  const { objs, vals } = radarData(ids, key);
+  const cx = 160, cy = 150, R = 98, n = RADAR_DIMS.length;
+  const colors = ['#5b9dff','#e3b661','#46b17b','#c07be0'];
+  const ang = i => -Math.PI/2 + i * 2*Math.PI/n;
+  let bg = '';
+  [0.25,0.5,0.75,1].forEach(f => {
+    const pts = RADAR_DIMS.map((_,i)=>`${cx+Math.cos(ang(i))*R*f},${cy+Math.sin(ang(i))*R*f}`).join(' ');
+    bg += `<polygon points="${pts}" fill="none" stroke="var(--grid-line)" stroke-width="1"/>`;
+  });
+  RADAR_DIMS.forEach((d,i)=>{
+    const x = cx+Math.cos(ang(i))*R, y = cy+Math.sin(ang(i))*R;
+    bg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--grid-line)"/>`;
+    const lx = cx+Math.cos(ang(i))*(R+26), ly = cy+Math.sin(ang(i))*(R+26);
+    bg += `<text x="${lx}" y="${ly+4}" text-anchor="middle" font-size="11" fill="var(--muted)">${d.k}</text>`;
+  });
+  // 归一化：每个维度取所选院校中的最大值为 100（至少为 1）
+  let polys = '', dots = '';
+  objs.forEach((s, si) => {
+    const pts = RADAR_DIMS.map((d,i) => {
+      const raw = vals[i][si];
+      const max = Math.max(...vals[i].filter(v=>v!=null), 1);
+      const ratio = raw == null ? 0.08 : clamp(raw / max, 0.08, 1);
+      const x = cx+Math.cos(ang(i))*R*ratio, y = cy+Math.sin(ang(i))*R*ratio;
+      dots += `<circle cx="${x}" cy="${y}" r="2.6" fill="${colors[si%4]}"/>`;
+      return `${x},${y}`;
+    }).join(' ');
+    polys += `<polygon points="${pts}" fill="${colors[si%4]}" fill-opacity=".13" stroke="${colors[si%4]}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  });
+  return { svg:`<svg viewBox="0 0 320 310" style="width:100%;height:100%">${bg}${polys}${dots}</svg>`, colors };
+}
+function renderCompare(){
+  if (!S.cmp.length){
+    $('#cmpBody').innerHTML = `<div class="slot">还没有选择院校 —— 在「院校查询」里点「加入对比」，最多 4 所</div>`;
+    return;
+  }
+  const { svg, colors } = radarSVG(S.cmp, S.cmpProg);
+  const objs = S.cmp.map(id => ALL.find(x=>x.id===id)).filter(Boolean);
+  const rows = [
+    ['省份', s => s.prov + (s.city && s.city!==s.prov ? ' · '+s.city : '')],
+    ['层次', s => (s.tags||[]).join(' / ') || '—'],
+    ['复试线', s => { const l = latestLine(s[S.cmpProg]); return l ? `${l.val}（${l.year}）` : (lineOf(s[S.cmpProg]) ? '≈ '+lineOf(s[S.cmpProg]) : '—'); }],
+    ['学费', s => s[S.cmpProg] && s[S.cmpProg].f ? s[S.cmpProg].f : '—'],
+    ['全程折算', s => { const w = feeTotalWan(s[S.cmpProg]); return isFinite(w) ? w + ' 万' : '—'; }],
+    ['学制', s => (s[S.cmpProg]||{}).d || '—'],
+    ['录取人数', s => { const e = parseCount((s[S.cmpProg]||{}).e); return e ? e+' 人' : '—'; }],
+    ['报录比', s => { const p = s[S.cmpProg]||{}; const e = parseCount(p.e), a = parseCount(p.a); return e&&a ? (a/e).toFixed(1)+' : 1' : '—'; }],
+    ['初试科目', s => { const p = s[S.cmpProg]||{}; return (p.m||'待核实') + (p.j?' + '+p.j:''); }],
+    ['参考书目', s => (s[S.cmpProg]||{}).bk || '—'],
+    ['就业口碑', s => (s[S.cmpProg]||{}).emp || '—'],
+    ['备注', s => (s[S.cmpProg]||{}).nt || '—'],
+    ['资料完整度', s => filledCount(s) + ' 项']
+  ];
+  $('#cmpBody').innerHTML = `<div class="cmp-grid">
+    <div class="radar-wrap">
+      <div class="legend">${objs.map((s,i)=>`<span class="li"><em style="background:${colors[i%4]}"></em>${esc(s.name)}</span>`).join('')}</div>
+      <div style="height:290px">${svg}</div>
+      <p style="font-size:var(--fz-xs);color:var(--muted);line-height:1.7;padding:0 10px 10px">雷达按本次所选院校的相对表现归一化，只用于横向比较，不是绝对评分。</p>
+    </div>
+    <div class="panel" style="margin:0;overflow-x:auto">
+      <table class="cmp-table">
+        <thead><tr><th></th>${objs.map(s=>`<th>${esc(s.name)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(([k,fn])=>`<tr><td>${k}</td>${objs.map(s=>`<td><div class="clamp" onclick="this.classList.toggle('open')">${esc(fn(s))}</div></td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+  </div>`;
+  // 专硕/学硕切换
+  $('#cmpProgChip').innerHTML = `<button><span class="k">看</span><span class="v">${S.cmpProg==='z'?'金融专硕':'金融学硕'}</span>
+    <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="pop"><div class="opt ${S.cmpProg==='z'?'sel':''}" data-p="z"><span class="box"></span>金融专硕</div>
+    <div class="opt ${S.cmpProg==='x'?'sel':''}" data-p="x"><span class="box"></span>金融学硕</div></div>`;
+  const chip = $('#cmpProgChip');
+  chip.querySelector('button').onclick = e => { e.stopPropagation(); chip.querySelector('.pop').classList.toggle('on'); };
+  chip.querySelectorAll('[data-p]').forEach(o => o.onclick = e => {
+    e.stopPropagation(); S.cmpProg = o.dataset.p; renderCompare();
+  });
+}
+
+/* ============================================================
+   国家线
+   ============================================================ */
+function renderNational(){
+  const rows = NAT.rows.slice().sort((a,b)=>a.year-b.year);
+  const W = 760, H = 260, pl = 46, pr = 20, pt = 22, pb = 32;
+  const vals = rows.flatMap(r => [r.A.total, r.B.total]);
+  const min = Math.floor((Math.min(...vals)-12)/10)*10, max = Math.ceil((Math.max(...vals)+12)/10)*10;
+  const x = i => pl + i*(W-pl-pr)/(rows.length-1);
+  const y = v => pt + (max-v)/(max-min)*(H-pt-pb);
+  const grid = [];
+  for (let v = min; v <= max; v += 10){
+    grid.push(`<line x1="${pl}" y1="${y(v)}" x2="${W-pr}" y2="${y(v)}" stroke="var(--grid-line)"/>`);
+    grid.push(`<text x="${pl-8}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)">${v}</text>`);
+  }
+  const path = key => rows.map((r,i)=>`${i?'L':'M'}${x(i)},${y(r[key].total)}`).join(' ');
+  const labels = rows.map((r,i)=>`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${r.year}</text>`).join('');
+  const pts = (key, color) => rows.map((r,i)=>{
+    const anchor = i === 0 ? 'start' : i === rows.length-1 ? 'end' : 'middle';
+    const dx = i === 0 ? 3 : i === rows.length-1 ? -3 : 0;
+    return `<circle cx="${x(i)}" cy="${y(r[key].total)}" r="3.5" fill="var(--surface)" stroke="${color}" stroke-width="2"/>
+     <text x="${x(i)+dx}" y="${y(r[key].total)-10}" text-anchor="${anchor}" font-size="10.5" fill="var(--text-2)" style="font-variant-numeric:tabular-nums">${r[key].total}</text>`;
+  }).join('');
+  $('#lineChart').innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100%;max-width:880px;display:block;margin:0 auto">
+    ${grid.join('')}
+    <path d="${path('A')}" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="${path('B')}" fill="none" stroke="var(--gold)" stroke-width="2.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
+    ${pts('A','var(--brand)')}${pts('B','var(--gold)')}${labels}
+    <g font-size="11">
+      <rect x="${W-118}" y="${pt}" width="10" height="3" fill="var(--brand)"/><text x="${W-102}" y="${pt+5}" fill="var(--text-2)">A 区</text>
+      <rect x="${W-118}" y="${pt+18}" width="10" height="3" fill="var(--gold)"/><text x="${W-102}" y="${pt+23}" fill="var(--text-2)">B 区</text>
+    </g>
+  </svg>`;
+  $('#nationalTable').innerHTML = `<table>
+    <thead><tr><th>年份</th><th>A 区总分</th><th>A 区单科</th><th>B 区总分</th><th>B 区单科</th><th>说明</th></tr></thead>
+    <tbody>${NAT.rows.map(r=>`<tr>
+      <td class="n"><b>${r.year}</b></td>
+      <td class="n" style="color:var(--brand);font-weight:600">${r.A.total}</td>
+      <td class="n">${r.A.s1} / ${r.A.s2}</td>
+      <td class="n" style="color:var(--gold);font-weight:600">${r.B.total}</td>
+      <td class="n">${r.B.s1} / ${r.B.s2}</td>
+      <td style="color:var(--muted)">${esc(r.note||'—')}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+/* ============================================================
+   收藏
+   ============================================================ */
+function renderFav(){
+  const list = ALL.filter(s => S.fav.has(s.id));
+  $('#favSub').textContent = list.length ? `${list.length} 所院校` : '';
+  if (!list.length){
+    $('#favBody').innerHTML = `<div class="slot">还没有收藏 —— 点院校卡右侧的 ☆ 加入收藏</div>`;
+    return;
+  }
+  const sorted = list.slice().sort((a,b) => (lineOf(progOf(b))||0) - (lineOf(progOf(a))||0));
+  $('#favBody').innerHTML = sorted.map(cardHTML).join('');
+  bindCards('#favBody');
+}
+
+/* ============================================================
+   时间线
+   ============================================================ */
+const MILESTONES = [
+  {d:'2026-09 ~ 10', t:'2027 招生简章 / 专业目录发布', s:'done', x:'重点核对：是否改考 396、学费学制、拟招人数、参考书目变更。本工具的数据就是按这个窗口更新的。'},
+  {d:'2026-09 下旬', t:'预报名', s:'done', x:'应届生可预报名，信息与正式报名同等有效。'},
+  {d:'2026-10-05 ~ 10-25', t:'正式报名', s:'now', x:'研招网统一报名，只能保留一条有效报名信息。'},
+  {d:'2026-11 上旬', t:'网上确认', s:'', x:'上传照片、学历学籍材料，逾期不补。'},
+  {d:'2026-12 下旬', t:'初试', s:'', x:'第一天上午政治、下午英语；第二天上午数学/396、下午 431 金融学综合。'},
+  {d:'2027-02 下旬', t:'初试成绩 + 国家线', s:'', x:'经济学门类国家线同期公布，可用本工具「国家线参考」对照。'},
+  {d:'2027-03 中下旬', t:'复试线 / 复试 / 调剂', s:'', x:'34 所自划线院校 3 月上旬划线；调剂系统一般 3 月底开放。'},
+  {d:'2027-04 ~ 06', t:'拟录取公示', s:'', x:'关注目标院校研究生院公示，核对录取人数与推免占比。'}
+];
+function renderTimeline(){
+  $('#timeline').innerHTML = MILESTONES.map(m => `<div class="tl-item ${m.s||''}">
+    <span class="tl-dot"></span>
+    <div class="tl-date">${m.d}</div>
+    <div class="tl-title">${m.t}${m.s==='now'?'<span class="badge-now">当前</span>':''}</div>
+    <div class="tl-desc">${m.x}</div>
+  </div>`).join('');
+  const yc = {};
+  ALL.forEach(s => { const y = s.y || '未标注'; yc[y] = (yc[y]||0)+1; });
+  const progTotal = ALL.reduce((n,s)=>n + (s.z?1:0)+(s.x?1:0), 0);
+  $('#yearStat').innerHTML = `<table>
+    <thead><tr><th>参考年份</th><th>院校数</th><th>占比</th><th>状态</th></tr></thead>
+    <tbody>${Object.entries(yc).sort((a,b)=>b[0].localeCompare(a[0])).map(([y,n])=>`<tr>
+      <td class="n"><b>${y}</b></td><td class="n">${n}</td>
+      <td class="n">${(n/ALL.length*100).toFixed(0)}%</td>
+      <td style="color:var(--muted)">${y==='2026'?'复试线与录取数据已固化':'待核对'}</td>
+    </tr>`).join('')}</tbody></table>
+    <p style="font-size:var(--fz-md);color:var(--muted);margin-top:12px;line-height:1.8">
+      共 ${progTotal} 个招生方向（学硕 + 专硕）。2027 年的复试线要到 2027 年 3 月才公布，因此当前最新的<b>精确复试线</b>仍为 2026 年；2027 简章能确认的是<b>科目、学费、学制、拟招人数</b>，这部分正在分批补充。
+    </p>`;
+}
+
+/* ============================================================
+   数据质量
+   ============================================================ */
+function renderQuality(){
+  const FIELDS = [['l','复试线'],['la','复试线约数'],['f','学费'],['d','学制'],['e','录取人数'],['a','报名人数'],['j','专业课'],['m','数学科目'],['bk','参考书'],['emp','就业口碑']];
+  const progs = [];
+  ALL.forEach(s => { ['z','x'].forEach(k => { if (s[k]) progs.push(s[k]); }); });
+  const N = progs.length;
+  $('#quality').innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+    ${FIELDS.map(([k,label]) => {
+      const n = progs.filter(p => p[k] && !/^待核实$/.test(String(p[k]))).length;
+      const pct = Math.round(n/N*100);
+      const tone = pct >= 80 ? 'var(--ok)' : pct >= 40 ? 'var(--warn)' : 'var(--bad)';
+      return `<div style="background:var(--surface-2);border-radius:10px;padding:12px 14px">
+        <div style="font-size:var(--fz-sm);color:var(--muted);margin-bottom:6px">${label}</div>
+        <div class="num" style="font-size:18px;font-weight:650">${n}<span style="font-size:11px;color:var(--muted);font-weight:400"> / ${N}</span></div>
+        <div style="height:4px;border-radius:3px;background:var(--surface-3);margin-top:8px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${tone}"></div>
+        </div>
+        <div style="font-size:var(--fz-xs);color:${tone};margin-top:5px;font-weight:600">${pct}%</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+  const gaps = ALL.map(s => ({s, n:filledCount(s), missing:['f','e','d','j','bk'].filter(f => { const p = progOf(s); return p && (!p[f] || /^待核实$/.test(String(p[f]))); })}))
+    .sort((a,b)=>a.n-b.n).slice(0,12);
+  $('#gapList').innerHTML = `<table>
+    <thead><tr><th>院校</th><th>省份</th><th>层次</th><th>完整度</th><th>缺</th></tr></thead>
+    <tbody>${gaps.map(g=>`<tr>
+      <td><b>${esc(g.s.name)}</b></td><td>${esc(g.s.prov)}</td>
+      <td style="color:var(--muted)">${esc(tierOf(g.s)||'—')}</td>
+      <td class="n">${g.n} 项</td>
+      <td style="color:var(--bad);font-size:var(--fz-sm)">${g.missing.map(m=>({f:'学费',e:'录取',d:'学制',j:'专业课',bk:'参考书'})[m]).join(' / ')||'—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+/* ============================================================
+   导出
+   ============================================================ */
+function exportCsv(){
+  const list = filterSchools();
+  const rows = [['院校','省份','城市','层次','方向','复试线','年份','学费','学制','录取人数','报名人数','数学','专业课','分差档','分差','资料完整度']];
+  list.forEach(s => {
+    ['z','x'].forEach(k => {
+      const p = s[k]; if (!p) return;
+      const l = latestLine(p), ln = lineOf(p), m = matchOf(ln, S.score);
+      rows.push([s.name, s.prov, s.city||'', (s.tags||[]).join('/'), k==='z'?'专硕':'学硕',
+        ln||'', l?l.year:'', p.f||'', p.d||'', parseCount(p.e)||'', parseCount(p.a)||'',
+        p.m||'', p.j||'', m?m.label:'', m?m.diff:'', filledCount(s)]);
+    });
+  });
+  download('金融考研择校_筛选结果.csv', toCsv(rows));
+  toast('已导出 ' + (rows.length-1) + ' 行');
+}
+$('#btnFavCsv').onclick = () => {
+  const list = ALL.filter(s => S.fav.has(s.id));
+  if (!list.length){ toast('收藏夹是空的'); return; }
+  const rows = [['院校','省份','层次','专硕复试线','学硕复试线','学费','备注']];
+  list.forEach(s => rows.push([s.name, s.prov, (s.tags||[]).join('/'),
+    (latestLine(s.z)||{}).val||'', (latestLine(s.x)||{}).val||'', (s.z||s.x||{}).f||'', s.note||'']));
+  download('金融考研择校_收藏.csv', toCsv(rows));
+};
+$('#btnCmpCsv').onclick = () => {
+  if (!S.cmp.length){ toast('先选院校再导出'); return; }
+  const objs = S.cmp.map(id=>ALL.find(x=>x.id===id)).filter(Boolean);
+  const rows = [['指标', ...objs.map(s=>s.name)]];
+  const push = (k, fn) => rows.push([k, ...objs.map(fn)]);
+  push('复试线', s => { const l = latestLine(s[S.cmpProg]); return l?l.val:''; });
+  push('学费', s => (s[S.cmpProg]||{}).f||'');
+  push('学制', s => (s[S.cmpProg]||{}).d||'');
+  push('录取人数', s => parseCount((s[S.cmpProg]||{}).e)||'');
+  push('初试科目', s => { const p=s[S.cmpProg]||{}; return (p.m||'')+(p.j?' + '+p.j:''); });
+  download('金融考研择校_对比.csv', toCsv(rows));
+};
+
+/* ============================================================
+   择校报告（打印成 PDF）
+   ============================================================ */
+function buildReport(){
+  const list = filterSchools();
+  const withScore = list.filter(s => matchOf(lineOf(progOf(s)), S.score));
+  const byTier = k => withScore.filter(s => (matchOf(lineOf(progOf(s)), S.score)||{}).key === k);
+  const groups = [['bao','保底','复试线低于预估分 15 分以上'],['wen','稳妥','与预估分相差 0~15 分'],['chong','冲刺','预估分低于复试线 0~15 分'],['none','差距大','预估分低于复试线 15 分以上']];
+  const conds = [
+    S.q ? `关键词「${S.q}」` : '', S.provs.size ? `省份：${[...S.provs].join('、')}` : '',
+    S.tags.size ? `层次：${[...S.tags].join('、')}` : '', S.math ? `数学：${S.math}` : '',
+    S.complete ? `资料：${(COMPLETES.find(c=>c.v===S.complete)||{}).label}` : ''
+  ].filter(Boolean).join('；') || '全部院校';
+  const table = arr => `<table><thead><tr><th>院校</th><th>省份</th><th>方向</th><th>复试线</th><th>分差</th><th>学费全程</th><th>录取</th></tr></thead><tbody>
+    ${arr.slice(0,30).map(s => {
+      const key = progKeyOf(s), p = s[key]||{};
+      const l = latestLine(p), m = matchOf(lineOf(p), S.score), fee = feeTotalWan(p), e = parseCount(p.e);
+      return `<tr><td><b>${esc(s.name)}</b></td><td>${esc(s.prov)}</td><td>${key==='z'?'专硕':'学硕'}</td>
+        <td>${l?l.val:'—'}</td><td>${m?(m.diff>0?'+':'')+m.diff:''}</td>
+        <td>${isFinite(fee)?fee+' 万':'—'}</td><td>${e?e+' 人':'—'}</td></tr>`;
+    }).join('')}</tbody></table>`;
+  const now = new Date();
+  $('#report').innerHTML = `
+    <div class="r-title">金融考研择校报告</div>
+    <div class="r-sub">生成时间 ${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} · 数据年份 2026 · 数据版本 ${esc(DATA_VER)}</div>
+    <div class="r-sec">
+      <h3>一、筛选条件</h3>
+      <p>${esc(conds)}${S.score?`；预估总分 <b>${S.score}</b> 分`:''}</p>
+      <div class="r-kpi">
+        <div><b>${list.length}</b><span>符合条件院校</span></div>
+        <div><b>${withScore.length}</b><span>可参与分数匹配</span></div>
+        <div><b>${byTier('bao').length}</b><span>保底</span></div>
+        <div><b>${byTier('wen').length}</b><span>稳妥</span></div>
+        <div><b>${byTier('chong').length}</b><span>冲刺</span></div>
+        <div><b>${byTier('none').length}</b><span>差距大</span></div>
+      </div>
+    </div>
+    ${S.score ? groups.filter(([k])=>byTier(k).length).map(([k,label,desc]) => `
+      <div class="r-sec">
+        <h3>${label}（${byTier(k).length} 所）</h3>
+        <p style="font-size:9pt;color:#666;margin-bottom:2mm">${desc}</p>
+        ${table(byTier(k).sort((a,b)=> (lineOf(progOf(b))||0) - (lineOf(progOf(a))||0) ))}
+      </div>`).join('') : `
+      <div class="r-sec"><h3>院校清单</h3>${table(list)}</div>`}
+    ${S.fav.size ? `<div class="r-sec"><h3>已收藏院校</h3>${table(ALL.filter(s=>S.fav.has(s.id)))}</div>` : ''}
+    <div class="r-foot">
+      数据来源：研招网（yz.chsi.com.cn）、各院校研究生院官网、当年招生简章及公开报道，整理日期截至 2026 年 10 月。<br>
+      本报告仅供择校参考，不构成任何报考建议或录取承诺。复试线、学费、招生人数每年变化，报考前务必以目标院校当年招生简章为准。<br>
+      标记「—」的字段表示公开渠道无可靠数据，本工具不编造数字。
+    </div>`;
+  window.print();
+}
+$('#btnReport').onclick = () => {
+  if (!S.score && !S.provs.size && !S.tags.size && !S.q){
+    if (!confirm('当前没有设置任何筛选条件，报告将包含全部 211 所院校。继续生成？')) return;
+  }
+  buildReport();
+};
+
+/* ============================================================
+   视图切换 / 主题
+   ============================================================ */
+const NAV = [
+  {id:'query',    label:'院校查询', icon:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'},
+  {id:'national', label:'国家线',   icon:'<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-5 3 3 5-7"/>'},
+  {id:'compare',  label:'院校对比', icon:'<rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/>'},
+  {id:'fav',      label:'我的收藏', icon:'<path d="m12 3 2.7 5.9 6.3.7-4.7 4.4 1.3 6.3L12 17l-5.6 3.3 1.3-6.3L3 9.6l6.3-.7z"/>'},
+  {id:'timeline', label:'备考时间线', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>'},
+  {id:'data',     label:'数据质量', icon:'<path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h13"/>'}
+];
+function renderNav(){
+  $('#nav').innerHTML = NAV.map(n => {
+    let badge = '';
+    if (n.id === 'fav' && S.fav.size) badge = `<span class="badge">${S.fav.size}</span>`;
+    if (n.id === 'compare' && S.cmp.length) badge = `<span class="badge">${S.cmp.length}</span>`;
+    return `<div class="nav-item ${S.view===n.id?'on':''}" data-view="${n.id}">
+      <svg viewBox="0 0 24 24">${n.icon}</svg><span>${n.label}</span>${badge}</div>`;
+  }).join('');
+  $$('.nav-item').forEach(el => el.onclick = () => switchView(el.dataset.view));
+}
+function switchView(v){
+  S.view = v;
+  $$('.view').forEach(el => el.classList.toggle('on', el.id === 'v-'+v));
+  renderNav();
+  $('#main').scrollTop = 0;
+  if (v === 'compare') renderCompare();
+  if (v === 'fav') renderFav();
+  if (v === 'timeline') renderTimeline();
+  if (v === 'data') renderQuality();
+}
+/* 'auto' 需要落到具体值才能命中变量表，所以由 JS 解析后写死 data-theme */
+const MQ = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+function resolvedTheme(){ return S.theme === 'auto' ? ((MQ && MQ.matches) ? 'dark' : 'light') : S.theme; }
+function applyTheme(){
+  const t = resolvedTheme();
+  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.style.colorScheme = t;
+}
+if (MQ && MQ.addEventListener) MQ.addEventListener('change', () => { if (S.theme === 'auto') applyTheme(); });
+$('#btnTheme').onclick = () => {
+  S.theme = resolvedTheme() === 'dark' ? 'light' : 'dark';
+  store.set('v2-theme', S.theme); applyTheme();
+  toast(S.theme === 'dark' ? '深色模式' : '浅色模式');
+};
+
+/* ============================================================
+   初始化
+   ============================================================ */
+let qTimer;
+$('#q').oninput = e => {
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => { S.q = e.target.value; renderQuery(); }, 120);
+};
+$('#score').oninput = e => {
+  const v = parseInt(e.target.value, 10);
+  S.score = (isFinite(v) && v > 0) ? v : null;
+  store.set('v2-score', S.score);
+  updateFilterLabels(); renderQuery();
+  if (S.view === 'fav') renderFav();
+};
+
+applyTheme();
+$('#dataVer').textContent = DATA_VER;
+$('#dataCount').textContent = ALL.length;
+
+/* 演示 / 截图用：?view=compare&score=370&theme=light&cmp=pkd,tsinghua */
+const QS = new URLSearchParams(location.search);
+if (['light','dark'].includes(QS.get('theme'))) S.theme = QS.get('theme');
+if (QS.get('score')){ const v = parseInt(QS.get('score'),10); if (isFinite(v)) S.score = v; }
+if (QS.get('view') && NAV.some(n=>n.id===QS.get('view'))) S.view = QS.get('view');
+if (QS.get('cmp')){
+  const ids = QS.get('cmp').split(',').map(s=>s.trim()).filter(id => ALL.some(s=>s.id===id));
+  if (ids.length) S.cmp = ids.slice(0,4);
+}
+applyTheme();
+$('#score').value = S.score || '';
+buildFilterBar();
+renderNav();
+renderQuery();
+renderCmpBar();
+renderNational();
+if (S.view !== 'query') switchView(S.view);
+if (QS.get('school') && ALL.some(s => s.id === QS.get('school'))) openDetail(QS.get('school'));
+window.__v2ready = true;
+})();
+</script>
+</body>
+</html>
