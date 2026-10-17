@@ -1,0 +1,43 @@
+name: Bug 反馈
+description: 界面错乱、功能异常、打包失败
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 现象
+      description: 发生了什么，期望是什么
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开「院校查询」
+        2. 预估分填 370
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 运行环境
+      options:
+        - 桌面版（Windows 安装包）
+        - 网页版（浏览器）
+        - 开发模式 npm start
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 侧栏底部或安装包文件名里的版本号
+      placeholder: v1.4.1
+  - type: textarea
+    id: extra
+    attributes:
+      label: 截图 / 报错日志
+      description: 界面问题请附截图，比文字描述有用得多

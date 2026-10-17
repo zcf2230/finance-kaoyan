@@ -1,0 +1,62 @@
+name: 数据纠错 / 补数据
+description: 某所院校的复试线、学费、招生人数不对，或者有缺失
+title: "[数据] "
+labels: ["data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        谢谢帮忙校对。这个项目**不编造数字**，所以每处改动都需要一个能点开的出处。
+        如果只是"听说"，请先不要提交 —— 留空比填错更有价值。
+  - type: input
+    id: school
+    attributes:
+      label: 院校名称
+      placeholder: 中央财经大学
+    validations:
+      required: true
+  - type: dropdown
+    id: program
+    attributes:
+      label: 招生方向
+      options:
+        - 金融专硕（0251）
+        - 金融学硕（0202）
+        - 两者都有问题
+    validations:
+      required: true
+  - type: checkboxes
+    id: fields
+    attributes:
+      label: 涉及字段
+      options:
+        - label: 复试线
+        - label: 学费
+        - label: 学制
+        - label: 录取 / 招生人数
+        - label: 初试科目（数学 / 专业课）
+        - label: 参考书目
+        - label: 其他
+  - type: textarea
+    id: current
+    attributes:
+      label: 现在显示的是
+      description: 应用里的值，或"显示为 —"
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: 应该是
+      description: 年份 + 具体数值
+      placeholder: 2026 年复试线 332 分（单科 40/60）
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: 出处链接
+      description: 优先研究生院官网 / 学院简章 / 财务处收费公示；考研机构页面只能作线索
+      placeholder: https://sf.cufe.edu.cn/info/1104/16109.htm
+    validations:
+      required: true
