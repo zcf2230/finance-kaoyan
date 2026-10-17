@@ -24,8 +24,8 @@ jobs:
       - name: 数据能解析（坏 JSON 会让整个应用启动失败）
         run: node tools/report-gaps.js --no-write > /dev/null
 
+      - name: 先构建网页版（test-web-mode 需要 dist-web/）
+        run: npm run build:web
+
       - name: 渲染 / 迁移 / 网页版 / 鉴权测试
         run: npm test
-
-      - name: 网页版能构建
-        run: npm run build:web
