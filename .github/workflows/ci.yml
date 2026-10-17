@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # 迁移测试要从根提交取 v1.0.0 基线数据
 
       - uses: actions/setup-node@v4
         with:
