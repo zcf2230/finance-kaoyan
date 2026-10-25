@@ -48,7 +48,10 @@ const tier = s => (s.tags || []).includes('985') ? 1 : ((s.tags || []).includes(
 const batches = [1, 2, 3].map(t => schools.filter(s => tier(s) === t)
   .sort((a, b) => filled(a) - filled(b)));
 
-const DONE = new Set(['yangcai', 'shangcai', 'duimao', 'xinancaijing']);   // 已完成 2027 简章核对
+// 已完成 2027 简章核对的从备注识别：新批次打「2027简章已核」标记，前两批统一以「2027级」开头。
+// 硬编码院校名单每次加一批就要改一次代码，且漏改会让已核对的院校继续显示「待补」。
+const DONE = new Set(schools.filter(s => ['z', 'x'].some(k => s[k] &&
+  (/2027简章已核/.test(String(s[k].nt || '')) || /2027级/.test(String(s[k].nt || ''))))).map(s => s.id));
 
 const pct = n => Math.round(n / progs.length * 100);
 const lines = [];
