@@ -26,12 +26,20 @@ const CHECKS = [
   ['深色模式', 'prefers-color-scheme: dark'],
   ['打印样式', '@media print'],
   ['移动端适配（900px 断点）', 'max-width: 900px'],
-  ['登录退出入口', '退出登录']
+  ['登录退出入口', '退出登录'],
+  ['2027 批次三数据', '2027简章已核']
 ];
+
+// 旧产物目录偶尔会被杀软/索引器锁住删不掉，此时改打包到 dist-new 也能被核验到，
+// 取最新的那份 win-unpacked，避免把旧产物误判成刚打好的包。
+const unpacked = ['dist', 'dist-new']
+  .map(d => path.join(ROOT, d, 'win-unpacked', 'resources', 'app.asar'))
+  .filter(f => fs.existsSync(f))
+  .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0];
 
 const TARGETS = [
   ['网页单文件 dist-web/index.html', path.join(ROOT, 'dist-web/index.html')],
-  ['免安装版 dist/win-unpacked', path.join(ROOT, 'dist/win-unpacked/resources/app.asar')],
+  ['免安装版（最新打包目录）', unpacked || path.join(ROOT, 'dist/win-unpacked/resources/app.asar')],
   ['已安装版', INSTALLED]
 ];
 
